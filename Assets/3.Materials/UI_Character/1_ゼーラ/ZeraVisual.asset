@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71bdeb7976612974db43dc47c392cdb9, type: 3}
+  m_Name: ZeraVisual
+  m_EditorClassIdentifier: 
+  KeyVisual: {fileID: 5268466115024516090, guid: 8d772b476b00c244883f4b4fb73857c6, type: 3}
+  BustUp: {fileID: -6943469623463663405, guid: ac775944ba0d17048a3e95a64f848377, type: 3}
+  Icon: {fileID: 5343219967921329943, guid: 2d189e888c026f447bf7eba23bf8d431, type: 3}

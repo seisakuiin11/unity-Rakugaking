@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3721889ef50856e439a89d27353d1865, type: 3}
+  m_Name: WasshoiData
+  m_EditorClassIdentifier: Assembly-CSharp::AttackData
+  AtkDamage: 500
+  AtkHitStanFrame: 10
+  KnockBackData:
+    SpecifyDirectionFlag: 1
+    KnockBackVec: {x: 0, y: 1}
+    KnockBackPower: 15
+  AllFrame: 30
+  data:
+  - TargetFrame: 0
+    colliders:
+    - radius: 1
+      localPos: {x: 1, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 0
+    - radius: 1
+      localPos: {x: 2, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 0
+  - TargetFrame: 30
+    colliders: []
