@@ -38,16 +38,15 @@ public class PlayersController : MonoBehaviour
         // 全プレイヤーの入力情報を確認
         for(int i = 0; i < data.Length; i++)
         {
+            // コントローラーが登録されていないなら
+            if (data[i] == null) continue;
+
             pause |= data[i].Value.MENU.IsPressed;
             pause |= data[i].Value.CANCEL.IsPressed;
         }
 
-        if(pause)
-        {
-            uiFlag = false;
-            ControllerInputManager.Instance.ChangeInputMode(INPUT_MODE.player);
-            OnPause?.Invoke(false);
-        }
+        // 誰か一人でも押していたら
+        if (pause) Pause(false); // 一時停止を解除
     }
 
     // ゲーム操作アップデート ===========================================
@@ -78,13 +77,7 @@ public class PlayersController : MonoBehaviour
         }
 
         // ポーズボタンを誰かが押していたら
-        if(pause)
-        {
-            // UI操作に切り替える
-            uiFlag = true;
-            ControllerInputManager.Instance.ChangeInputMode(INPUT_MODE.ui);
-            OnPause?.Invoke(true);
-        }
+        if (pause) Pause(true); // 一時停止
     }
     // ===============================================================
 
@@ -97,6 +90,7 @@ public class PlayersController : MonoBehaviour
         data.DIRECTION_VEC2 = _data.DIRECTION_VEC2;
         data.JUMP = _data.JUMP.now;
         data.ATTACK_UP = _data.ATTACK_UP.now;
+        data.ATTACK_UP_OLD = _data.ATTACK_UP.past;
         data.ATTACK_DOWN = _data.ATTACK_DOWN.now;
         data.ATTACK_LEFT = _data.ATTACK_LEFT.now;
         data.ATTACK_RIGHT = _data.ATTACK_RIGHT.now;
@@ -104,5 +98,20 @@ public class PlayersController : MonoBehaviour
         pause = _data.PAUSE;
 
         return data;
+    }
+
+    /// <summary>
+    /// 一時停止
+    /// </summary>
+    /// <param name="pause"></param>
+    public void Pause(bool pause)
+    {
+        uiFlag = pause;
+
+        // コントローラーのスキームを変える
+        if(pause) ControllerInputManager.Instance.ChangeInputMode(INPUT_MODE.ui);
+        else ControllerInputManager.Instance.ChangeInputMode(INPUT_MODE.player);
+
+        OnPause.Invoke(pause);
     }
 }

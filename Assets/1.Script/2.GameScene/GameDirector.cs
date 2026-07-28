@@ -6,9 +6,11 @@ public class GameDirector : MonoBehaviour
 {
     [SerializeField] Animator hideTransition;
     [SerializeField] int fadeTime;
+    [SerializeField] int waitFadeTime;
 
     [SerializeField] GameUIController gameUIController;
     [SerializeField] PlayersController playersController;
+    [SerializeField] CpuController cpuController;
     [SerializeField] CharacterCreater charCreater;
     [SerializeField] ColliderManager colManager;
 
@@ -36,11 +38,16 @@ public class GameDirector : MonoBehaviour
         //コライダーコントローラーのアップデート管理
         colManager.UpdateMethod();
 
+        // UIのアップデート処理
+        gameUIController.UpdateMethod(characters);
+
         if (gameState == GAMESTATE.PAUSE) return;
 
         // 一フレーム
         float delta = Time.deltaTime;
 
+        // CPUのアップデート処理
+        cpuController.UpdateMethod(characters);
 
         // キャラクターのアップデート処理
         foreach (var character in characters) character.UpdateMethod(delta);
@@ -86,9 +93,14 @@ public class GameDirector : MonoBehaviour
         playersController.OnPause += Pause;
 
         // CPU管理者の初期化処理
+        cpuController.Init(enemyChars.ToArray());
 
         // UI管理者の初期化処理
         gameUIController.Init(characters);
+
+        // BGM再生
+        SoundManager.Instance.BGMPlay(BGM.NARBO);
+        SoundManager.Instance.SEPlay(SE.BATTLE_START);
 
         
         // トランジション
@@ -128,6 +140,12 @@ public class GameDirector : MonoBehaviour
             ProjectManager.Instance.SetWinner(i);
         }
 
+        // SE 終了ホイッスル
+        SoundManager.Instance.SEPlay(SE.BATTLE_END);
+
+        // 少ししてから、フェイドアニメーション
+        await Task.Delay(waitFadeTime);
+
         // トランジション再生 画面を隠す
         hideTransition.SetTrigger("Show");
 
@@ -135,6 +153,30 @@ public class GameDirector : MonoBehaviour
 
         // リザルトシーンへ
         ProjectManager.Instance.ChangeScene(SceneName.ResultScene);
+    }
+
+    /// <summary>
+    /// 途中退出用
+    /// </summary>
+    public async void BackScene()
+    {
+        Pause(false);
+
+        // コントローラーをUI用に変える
+        ControllerInputManager.Instance.ChangeInputMode(INPUT_MODE.ui);
+
+        gameState = GAMESTATE.WAIT;
+
+        playersController.OnPause -= Pause;
+        gameUIController.GameEnd(characters);
+
+        // トランジション再生 画面を隠す
+        hideTransition.SetTrigger("Show");
+
+        await Task.Delay(fadeTime);
+
+        // リザルトシーンへ
+        ProjectManager.Instance.ChangeScene(SceneName.SelectScene);
     }
 
     /// <summary>

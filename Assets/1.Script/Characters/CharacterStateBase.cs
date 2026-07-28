@@ -1,10 +1,7 @@
 
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.EditorTools;
 using UnityEngine;
 
 
@@ -58,6 +55,8 @@ public class CharacterStateBase
     public virtual void StateUpdateMethod(InputCommandData _inputData)
     {
         inputData = _inputData;
+
+
     }
 
 
@@ -67,12 +66,13 @@ public class CharacterStateBase
     /// <param name="_damage"></param>
     /// <param name="_stanFrame"></param>
     /// <param name="_knockBack"></param>
-    public virtual void Damage(int _damage,int _stanFrame,KnockBackData _knockBack,Vector3 _colPos)
+    public virtual void Damage(int _damage,int _stanFrame,KnockBackData _knockBack,Collider _col)
     {
+        chara.ChangeState(CHARA_STATE.stan);
         chara.HPChange(-_damage);
         chara.SetStanFlame(_stanFrame);
-        chara.KnockBack(_knockBack, _colPos);
-        chara.ChangeState(CHARA_STATE.stan);
+        chara.KnockBack(_knockBack, _col);
+  
     }
 
 
@@ -115,13 +115,15 @@ public class IdleState : CharacterStateBase
 
         if (chara.ShieldCheck()) { chara.ChangeState(CHARA_STATE.shield); return; }
 
+        if (chara.MoveCheck()) { chara.ChangeState(CHARA_STATE.move); return; }
+
         if (chara.AttackCheck()) return;
 
         if (chara.JumpCheck()) { chara.ChangeState(CHARA_STATE.jump); return; }
 
         if (!chara.GroundCheck()) { chara.ChangeState(CHARA_STATE.air); return; }
 
-        if (chara.MoveCheck()) { chara.ChangeState(CHARA_STATE.move); return; }
+        if(_inputData.DIRECTION_DATA==DIRECTIONDATA.DOWN && chara.FootingGroundCheck(out var col))  { chara.FootingGroundOff(col);}
 
         chara.StopXMove();
         chara.ShieldHeal();
@@ -159,19 +161,22 @@ public class MoveState : CharacterStateBase
     public override void StateUpdateMethod(InputCommandData _inputData)
     {
         inputData = _inputData;
+        chara.FixedMoveAction(inputData.DIRECTION_VEC2);
 
         if (chara.ShieldCheck()){ chara.ChangeState(CHARA_STATE.shield); return; }
 
         if (chara.AttackCheck()) return;
 
         if (chara.JumpCheck()) { chara.ChangeState(CHARA_STATE.jump);  return; }
-
+        
         if (!chara.GroundCheck()){ chara.ChangeState(CHARA_STATE.air); return; }
 
         if (!chara.MoveCheck()) { chara.ChangeState(CHARA_STATE.idle); return; }
 
+        if (_inputData.DIRECTION_DATA == DIRECTIONDATA.DOWN && chara.FootingGroundCheck(out var col)) { chara.FootingGroundOff(col); }
+
         chara.ShieldHeal();
-        chara.MoveAction(inputData.DIRECTION_VEC2);
+   
         
     }
 
@@ -190,7 +195,7 @@ public class MoveState : CharacterStateBase
 /// </summary>
 public class JumpState : CharacterStateBase
 {
-
+    public event Action<CharacterController> OnJump;
 
     public override void StateInit(CharacterController _chara, Animator _anim)
     {
@@ -205,6 +210,8 @@ public class JumpState : CharacterStateBase
         chara.JumpAction();
         chara.ChangeState(CHARA_STATE.air);
 
+        OnJump?.Invoke(chara);
+    
     }
 
     public override void StateUpdateMethod(InputCommandData _inputData)
@@ -241,26 +248,26 @@ public class AirState : CharacterStateBase
 
     public override void StateStart()
     {
+        anim.SetTrigger("Idle");
         anim.SetBool("Air", true);
     }
 
 
     public override void StateUpdateMethod(InputCommandData _inputData)
     {
-
-        inputData = _inputData;
+        base.StateUpdateMethod(_inputData);
 
         if (chara.GroundCheck()) chara.ChangeState(CHARA_STATE.idle);
-
+        
         if (chara.AttackCheck()) return;
 
-        if (chara.MoveCheck()) chara.MoveAction(inputData.DIRECTION_VEC2);
+        if (chara.MoveCheck()) chara.FixedMoveAction(inputData.DIRECTION_VEC2);
        
         chara.ShieldHeal();
     }
 
     public override void StateEnd()
-    {
+    { 
         anim.SetBool("Air", false);
         base.StateEnd();
 
@@ -287,7 +294,7 @@ public class StanState : CharacterStateBase
 
     public override void StateStart()
     {
-        anim.SetBool("Air", true);
+        anim.SetTrigger("Stun");
     }
 
 
@@ -301,7 +308,6 @@ public class StanState : CharacterStateBase
 
     public override void StateEnd()
     {
-        anim.SetBool("Air", false);
         base.StateEnd();
 
     }
@@ -323,7 +329,7 @@ public class ShieldState:CharacterStateBase
 
     public override void StateStart()
     {
-        anim.SetBool("Air", true);
+        anim.SetTrigger("Shield");
     }
 
 
@@ -348,7 +354,7 @@ public class ShieldState:CharacterStateBase
         chara.ChangeState(CHARA_STATE.stan);
     }
 
-    public override void Damage(int _damage, int _stanFrame, KnockBackData _knockBackData,Vector3 _colPos)
+    public override void Damage(int _damage, int _stanFrame, KnockBackData _knockBackData,Collider _col)
     {
         chara.shieldValue -= (int)(_damage * chara.shieldDamageMultiply);
 
@@ -408,8 +414,9 @@ public class AttackState : CharacterStateBase
         atkNowFrame = 0;
         atkAllFrame = atkData.AllFrame;
 
-        //全体フレームを進める
-        atkNowFrame++;
+        //hitboxをリセット
+        chara.HitBoxReset();
+
     }
 
 
@@ -436,8 +443,12 @@ public class AttackState : CharacterStateBase
         if (atkNowFrame >= atkAllFrame)
         {
             AtkEnd();
+            return;
 
         }
+
+        //現在のターゲットフレームが存在しない場合は何もしない
+        if (targetFrameIndex > atkFrameData.Count) return;
 
         //現在のフレーム数がキーフレームの値以上になったらコライダー情報を更新
         if (atkNowFrame >= atkFrameData[targetFrameIndex].TargetFrame)
@@ -463,22 +474,52 @@ public class AttackState : CharacterStateBase
         var colDatas = atkFrameData[targetFrameIndex].colliders;
 
         
-        List<CircleColData> list=new();
+        List<CircleColData> _atkColList=new();
+        List<CircleColData> _hitBoxColList=new();
 
         //データに格納されているコライダーの数分行われる
         for(int i=0;i<colDatas.Count;i++)
         {
             var colData = colDatas[i];
+            //Transformを格納
             colData.trans = chara.gameObject.transform;
-            list.Add(colData);
+
+
+
+
+            var scaleY =chara.gameObject.transform.localScale.y;
+
+            //サイズを対象のTransform.LocalScaleのY軸に合わせる
+            colData.radius *= chara.gameObject.transform.localScale.y;
+
+            //位置関係を対象のTransform.LocalScaleのY軸に合わせる
+            colData.localPos = new Vector3(
+                colData.localPos.x * scaleY,
+                colData.localPos.y * scaleY,
+                colData.localPos.z * scaleY
+                );
+
+            Debug.Log(colData.colType);
+            if(colData.colType==COLLIDER_TYPE.AttackCol)_atkColList.Add(colData);
+            else if(colData.colType==COLLIDER_TYPE.HitBox)_hitBoxColList.Add(colData);
         }
 
-       
 
-        //コライダーの更新、生成
-        if (atkColList != null) colManager.DestroyCircleCol(atkColList);
-        atkColList = colManager.UpdateAttackColliderData(list, AtkHit);
+        Debug.Log(atkColList);
+        //攻撃コライダーの更新、生成
+        if (_atkColList != null)
+        {
+            if(atkColList!=null)colManager.DestroyCircleCol(atkColList);
+            atkColList = colManager.UpdateAttackColliderData(_atkColList, AtkHit);
+        }
 
+
+        //当たり判定の更新、生成
+        if (_hitBoxColList != null)
+        {
+            chara.HitBoxReset();
+            chara.UpdateHitBoxColliderData(_hitBoxColList);
+        }
 
     }
 
@@ -488,6 +529,7 @@ public class AttackState : CharacterStateBase
     /// </summary>
     protected virtual void AtkEnd()
     {
+
         //地上にいるならidle、空中にいるならairに戻す
         if (chara.GroundCheck()) chara.ChangeState(CHARA_STATE.idle);
         else chara.ChangeState(CHARA_STATE.air);
@@ -499,9 +541,13 @@ public class AttackState : CharacterStateBase
     /// </summary>
     /// <param name="chara">当たった相手</param>
     /// <param name="pos">当たったコライダーのworldPos</param>
-    protected virtual void AtkHit(CharacterController chara,Vector3 pos)
+    protected virtual void AtkHit(CharacterController chara,Collider col)
     {
-        chara.Damage(atkData.AtkDamage, atkData.AtkHitStanFrame, atkData.KnockBackData,pos);
+       
+       chara.Damage(atkData.AtkDamage, atkData.AtkHitStanFrame, atkData.KnockBackData,col);
+
+
+        
     }
 
 
@@ -512,7 +558,7 @@ public class AttackState : CharacterStateBase
 
         if (atkData == null) return;
         DestroyCollider();
-       
+        chara.HitBoxDefaultSet();
     }
 
 
@@ -522,5 +568,9 @@ public class AttackState : CharacterStateBase
     protected void DestroyCollider()
     {
         colManager.DestroyCircleCol(atkColList);
+        chara.HitBoxReset();
+
     }
+    
+
 }

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59a7e7993de3a74468e7aff3aee542ca, type: 3}
+  m_Name: SlasherData
+  m_EditorClassIdentifier: 
+  maxHp: 8500
+  maxShield: 300
+  moveSpeed: 600
+  jumpForce: 20
+  shieldBreakKnockBack:
+    KnockBackFlip: 0
+    Vector: 0
+    KnockBackVec: {x: 0, y: 1}
+    KnockBackPower: 30
+  animation: {fileID: 0}
+  leftAttackFrameData: {fileID: 11400000, guid: fc2abd0ba118a0f4c9245a2c9604f7b4, type: 2}
+  rightAttackFrameData: {fileID: 11400000, guid: f036799e39a0d7648b7aa2e9898d2165, type: 2}
+  upAttackFrameData: {fileID: 0}
+  downAttackFrameData: {fileID: 11400000, guid: 878cd22d2d3f89a4a952227a956d278f, type: 2}

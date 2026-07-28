@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 [Serializable]
-public struct CircleColData
+public struct CircleColData:Collider
 {
     /// <summary>
     /// 円の半径
@@ -24,11 +24,31 @@ public struct CircleColData
             var pos= trans.position + localPos;
             pos.x= trans.position.x + localPos.x* trans.localScale.x;
             return pos; } }
-    
+
+
+
+
+    public Vector3 LocalPos { get
+        {
+            var pos = localPos;
+            pos.x = localPos.x * trans.localScale.x;
+            return pos;
+        }
+    }
+
+
+    public Vector3 WorldPos { get { return worldPos; } }
+
+
     /// <summary>
     /// 追従するTransform
     /// </summary>
     public Transform trans;
+
+
+    public Transform Trans {  get { return trans; } }
+
+
 
     /// <summary>
     /// コライダーの特性(攻撃コライダーなど）)
@@ -38,8 +58,24 @@ public struct CircleColData
 }
 
 
+public interface Collider
+{
+    /// <summary>
+    /// 追従するオブジェクトからの位置
+    /// </summary>
+   public Vector3 LocalPos { get;  }
 
-    public enum COLLIDER_TYPE
+    /// <summary>
+    /// ゲーム内の位置
+    /// </summary>
+    public Vector3 WorldPos { get;}
+    
+
+    public Transform Trans { get; }
+}
+
+
+public enum COLLIDER_TYPE
 {
     AttackCol,
     HitBox,

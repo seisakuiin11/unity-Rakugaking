@@ -5,6 +5,7 @@ using UnityEngine;
 
 
 
+
 public class Collider_Circle
 {
     
@@ -50,14 +51,16 @@ public class Collider_Circle
 }
 
 
+/// <summary>
+/// 攻撃コライダー（円）
+/// </summary>
 public class Attack_Circle : Collider_Circle,IAttackCol
 {
 
 
 
-
     public Attack_Circle(CircleColData colData)
-        : base(colData) { }
+        : base(colData) {  }
 
 
     public Vector3 WorldPos => colData.worldPos;
@@ -94,7 +97,103 @@ public class Attack_Circle : Collider_Circle,IAttackCol
     }
 }
 
+public class PushBox_Circle : Collider_Circle
+{
+    public CharacterController controller { get; }
 
+    public float pastX { get; private set; }
+
+    const float pushForce =0.1f;
+
+
+
+    public PushBox_Circle(CircleColData colData, CharacterController chara) : base(colData)
+    {
+        controller = chara;
+        pastX = colData.worldPos.x;
+    }
+
+    public void Push(float xPower)
+    {
+        controller.Move(new Vector2(xPower, 0));
+    }
+
+    public void HitCheck(PushBox_Circle targetCol)
+    {
+
+  
+        //当たり判定      
+        var targetPos = targetCol.colData.worldPos;
+        var addHalfRadius = colData.radius + targetCol.colData.radius;
+
+        if (Vector3.Distance(colData.worldPos, targetPos) > addHalfRadius) 
+        {
+
+            targetCol = null;
+            return; 
+        }
+
+        //左右どちらにずれるかの判定
+        float i = colData.worldPos.x - targetPos.x;
+
+        PushJudge(i,targetCol);
+
+        targetCol = null;
+
+    }
+
+    /// <summary>
+    /// 左右どちらにずれるかの判定
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="targetCol"></param>
+    private void PushJudge(float value, PushBox_Circle targetCol)
+    {
+        //重なっていたら過去の位置を参照
+        if (value == 0)
+        {
+            value = pastX - targetCol.pastX;
+            
+            //それでも重なっていたら画面の左右で分ける
+            if (value == 0)
+            {
+
+
+                //y軸を参照して上のほうが優先して反対側に行く
+                float targetY = targetCol.colData.worldPos.y;
+                float i = colData.worldPos.y - targetY;
+
+
+                if (i > 0)
+                {
+                    //自身を優先する
+                    value = colData.worldPos.x;
+                }
+                else
+                {
+                    //相手を優先する
+                    value = -(targetCol.colData.worldPos.x);
+                }
+
+            }
+               
+        }
+
+        float dir = Mathf.Sign(value);
+
+        Push(dir * pushForce);
+        targetCol.Push(-dir * pushForce);
+
+    }
+
+    /// <summary>
+    /// pastXを保存する
+    /// </summary>
+    public void SavePastX()
+    {
+        pastX = colData.worldPos.x;
+    }
+}
 
 public class HitBox_Circle : Collider_Circle,IHitBoxCol
 {
@@ -102,7 +201,7 @@ public class HitBox_Circle : Collider_Circle,IHitBoxCol
   
     public HitBox_Circle(CircleColData colData,CharacterController chara): base(colData) 
     {
-    controller = chara;
+         controller = chara;
     }
 
   
@@ -113,6 +212,7 @@ public class HitBox_Circle : Collider_Circle,IHitBoxCol
 /// </summary>
 public interface IAttackCol
 {
+
     public bool CircleHitBoxCheck(HitBox_Circle hitBoxList);
 }
 
@@ -129,7 +229,31 @@ public interface IHitBoxCol
 
 
 
+public class HitBoxColliderList
+{
+        /// <summary>
+    ///　サークルコライダーリスト
+    /// </summary>
+    public List<HitBox_Circle> circleColList = new();
 
+  /// <summary>
+  /// 初期化
+  /// </summary>
+  /// <param name="_colList"></param>
+  /// <param name="chara">Hitboxの持ち主</param>
+    public HitBoxColliderList(List<CircleColData> _colList,CharacterController chara)
+    {
+        foreach (var col in _colList)
+        {
+            circleColList.Add(new HitBox_Circle(col,chara));
+        }
+    }
+
+    public IEnumerator<HitBox_Circle> GetEnumerator()
+    {
+        return circleColList.GetEnumerator();
+    }
+}
 
 
 
@@ -149,7 +273,7 @@ public  class AttackColliderList
     /// <summary>
     /// ヒットしたコライダーリスト
     /// </summary>
-    public List<IHitBoxCol> isHitBoxList { get; set; } = new();
+    public List<HitBoxColliderList> isHitBoxList = new();
 
     /// <summary>
     ///　サークルコライダーリスト
@@ -158,14 +282,14 @@ public  class AttackColliderList
 
 
 
-    public Action<CharacterController,Vector3> action { get; set; }
+    public Action<CharacterController,Collider> action { get; set; }
 
 
     /// <summary>
     /// 初期化
     /// </summary>
     /// <param name="_colList"></param>
-    public AttackColliderList(List<CircleColData> _colList, Action<CharacterController,Vector3> _action)
+    public AttackColliderList(List<CircleColData> _colList, Action<CharacterController,Collider> _action)
     {
         action += _action;
        foreach (var col in _colList)
@@ -185,27 +309,31 @@ public  class AttackColliderList
     /// コライダーが当たっているか判定する
     /// </summary>
     /// <param name="hitBoxList"></param>
-    public void HitboxCheckProcess(List<IHitBoxCol> hitBoxList)
+    public bool HitboxCheckProcess(HitBoxColliderList hitBoxList)
     {
-        foreach (HitBox_Circle hitbox in hitBoxList)
+        foreach (var col in circleColList)
         {
-            //対象のコライダーがすでにこのコライダー群にhitしていたら無視
-            if (isHitBoxList.Contains(hitbox)) continue;
+            
+
+                //対象のコライダーがすでにこのコライダー群にhitしていたら無視
+                if (isHitBoxList.Contains(hitBoxList)) continue;
+
+                foreach (HitBox_Circle hitBox in hitBoxList)
+                {
+                    //あたっていない場合は無視
+                    if (!col.CircleHitBoxCheck(hitBox)) continue;
 
 
-            foreach (var col in circleColList)
-            {
-                //あたっていない場合は無視
-                if (!col.CircleHitBoxCheck(hitbox)) continue;
 
-
-                action.Invoke(hitbox.controller, col.WorldPos);
-                isHitBoxList.Add(hitbox);
+                action.Invoke(hitBox.controller, col.colData);
+                    isHitBoxList.Add(hitBoxList);
+                   return true;
+                }
                 
-            }
+            
 
         }
-
+        return false;
 
 
     }

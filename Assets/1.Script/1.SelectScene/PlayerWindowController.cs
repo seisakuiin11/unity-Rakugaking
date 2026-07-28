@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,8 +7,19 @@ using UnityEngine.UI;
 public class PlayerWindowController : MonoBehaviour
 {
     [SerializeField, Header("ウィンドウ")] Image window;
+    [SerializeField, Header("テキストエリア")] Image textWindow;
+    [SerializeField, Header("テキスト 名前")] TextMeshProUGUI nameText;
+    [SerializeField, Header("テキスト 技")] TextMeshProUGUI[] skillNameText;
     [SerializeField, Header("キャラImage")] Image charaImg;
+    [SerializeField, Header("アクセスプレイヤーアイコン")] Animator[] accessPlayerIcons;
     [SerializeField, Header("決定アイコン")] GameObject acceptImg;
+    [Header("素材")]
+    [SerializeField] Sprite noneWindow;
+    [SerializeField] Sprite noneTextWindow;
+    [SerializeField] Sprite playerWindow;
+    [SerializeField] Sprite playerTextWindow;
+    [SerializeField] Sprite cpuWindow;
+    [SerializeField] Sprite cpuTextWindow;
 
     CharaIconsController charaSelecter;
 
@@ -25,6 +37,8 @@ public class PlayerWindowController : MonoBehaviour
         charaSelecter = _charaSelecter;
         index = _index;
         OnLeftPlayer += action;
+
+        for (int i = 0; i < accessPlayerIcons.Length; i++) { accessPlayerIcons[i].gameObject.SetActive(false); }
 
         PlayerNone();
     }
@@ -66,7 +80,10 @@ public class PlayerWindowController : MonoBehaviour
         playerType = PlayerType.NONE;
         accessPlayer = -1;
 
-        window.color = new Color(0.3f, 0.3f, 0.3f, 3f);
+        window.sprite = noneWindow;
+        textWindow.sprite = noneTextWindow;
+        nameText.text = "";
+        foreach (var t in skillNameText) t.text = "";
         charaImg.gameObject.SetActive(false);
         acceptImg.SetActive(false);
     }
@@ -83,13 +100,26 @@ public class PlayerWindowController : MonoBehaviour
         // 有人ならプレイヤー番号を 無人なら-1を
         playerNum = _player == PlayerType.PLAYER ? _accessPlayer : -1;
 
-        var color = playerType == PlayerType.PLAYER ? Color.red : Color.gray;
-        window.color = color;
+        // プレイヤーなら、プレイヤーの枠に
+        if(_player == PlayerType.PLAYER)
+        {
+            window.sprite = playerWindow;
+            textWindow.sprite= playerTextWindow;
+        }
+        else // CPUなら、CPUの枠に
+        {
+            window.sprite= cpuWindow;
+            textWindow.sprite= cpuTextWindow;
+        }
+
+        SetActiveAccessPlayerIcon(_accessPlayer, true, true);
         charaImg.gameObject.SetActive(true);
         acceptImg.SetActive(false);
 
         // キャライラストの取得
         charaImg.sprite = charaSelecter.SelectCharacter(_player, index, charaID);
+
+        SoundManager.Instance.SEPlay(SE.PLAYER_ENTRY);
     }
 
     /// <summary>
@@ -97,6 +127,8 @@ public class PlayerWindowController : MonoBehaviour
     /// </summary>
     public void Accept(int id)
     {
+        SetActiveAccessPlayerIcon(accessPlayer, true, false);
+
         // アクセスを解除
         accessPlayer = -1;
         charaID = id;
@@ -129,4 +161,15 @@ public class PlayerWindowController : MonoBehaviour
     /// 有人だった場合、そのプレイヤーの番号を返す, Cpuだった場合、-1を返す
     /// </summary>
     public int GetPlayerNum() => playerNum;
+
+    /// <summary>
+    /// アクセス中のプレイヤーアイコンの表示,非表示
+    /// </summary>
+    /// <param name="_playerNum">プレイヤー番号</param>
+    /// <param name="flag">表示,非表示</param>
+    public void SetActiveAccessPlayerIcon(int _playerNum, bool flag, bool animationFlag)
+    {
+        accessPlayerIcons[_playerNum].gameObject.SetActive(flag);
+        accessPlayerIcons[_playerNum].SetBool("Play", animationFlag);
+    }
 }

@@ -29,11 +29,16 @@ public class ProjectManager : MonoBehaviour
     [SerializeField] PlayerType[] playerTypes;  // ○Pが人間かCPUか
     [SerializeField] int winnerIndex;           // 勝者
 
+    [SerializeField] SoundManager soundManager;  // サウンド管理者
+    [SerializeField] GameObject backImg;
+
     SceneLoder sceneLoder;      // シーン管理者
 
 
-    private void Awake()
+    private async void Awake()
     {
+        backImg.SetActive(true); // 背景画像表示
+
         //すでにほかのContollerInputManagerがある場合は削除
         if (Instance != null)
         {
@@ -46,21 +51,28 @@ public class ProjectManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         //フレームレート固定
+        QualitySettings.vSyncCount = 0;
         Application.targetFrameRate = 60;
         // 解像度設定
         Screen.SetResolution(1920, 1080, true);
 
         sceneLoder = new SceneLoder();
 
+        SceneName _scene = NextScene;
 #if UNITY_EDITOR
         // デバッグ用 ゲームシーンスタートなら
-        if (NextScene > SceneName.SelectScene) ChangeScene(SceneName.JoinScene);
-        else ChangeScene(NextScene);
+        if (NextScene > SceneName.SelectScene) _scene = SceneName.JoinScene;
 #else
         // 初期化 - タイトルスタート
         NextScene = SceneName.TitleScene;
-        ChangeScene(NextScene);
+        _scene = SceneName.TitleScene;
 #endif
+
+        // サウンド素材のロード
+        await soundManager.Init(_scene);
+
+        // シーンを呼び出す
+        ChangeScene(_scene);
     }
 
     /// <summary>

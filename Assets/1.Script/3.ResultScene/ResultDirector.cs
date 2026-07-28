@@ -1,15 +1,13 @@
 using System.Threading.Tasks;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ResultDirector : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI winnerText;
     [SerializeField] Image winnerImg;
-    [SerializeField] Image[] charaImgs;
+    [SerializeField] Animator playerAnim;
     [SerializeField] Animator transitionAnim;
-    [SerializeField,Tooltip("m秒")] int TransitionAnimTime;
+    [SerializeField,Tooltip("ミリ秒")] int TransitionAnimTime;
 
     [SerializeField, Header("キャライラストデータ")]
     CharaVisualData[] charaVisuals;
@@ -46,8 +44,8 @@ public class ResultDirector : MonoBehaviour
         // 勝者のプレイヤー番号とキャラIDを取得
         ProjectManager.Instance.GetWinner(out var playerIndex, out var charaNum);
 
-        winnerText.text = (playerIndex + 1) + "P";
-        winnerImg.sprite = charaVisuals[charaNum].BustUp;
+        winnerImg.sprite = charaVisuals[charaNum].KeyVisual;
+        playerAnim.SetInteger("Player", playerIndex);
 
         // キャラID取得
         var charaIDs = ProjectManager.Instance.GetCharaIDs();
@@ -60,12 +58,12 @@ public class ResultDirector : MonoBehaviour
             if (i == playerIndex) continue; // 勝者のアイコンは用意しない
 
             int id = charaIDs[i];
-            charaImgs[count].sprite = charaVisuals[id].BustUp;
             count++;
         }
 
-        // 不要なアイコンは消す
-        for (int i = count; i < charaImgs.Length; i++) charaImgs[i].gameObject.SetActive(false);
+        // BGM再生
+        SoundManager.Instance.BGMPlay(BGM.RESULT);
+        SoundManager.Instance.SEPlay(SE.RESULT_JINGLE);
 
         // トランジション再生 画面表示
         transitionAnim.gameObject.SetActive(true);

@@ -7,6 +7,8 @@ public enum SceneName
     TitleScene,
     SelectScene,
     GameScene,
+    TrainingScene,
+    TutorialScene,
     ResultScene,
     JoinScene,
     TestScene

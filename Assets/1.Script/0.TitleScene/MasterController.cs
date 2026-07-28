@@ -22,6 +22,11 @@ public class MasterController : MonoBehaviour
         directer.BackTitle();
     }
 
+    public void OnMenu(InputAction.CallbackContext context)
+    {
+        directer.BackTitle();
+    }
+
     // 移動
     public void OnNavigate(InputAction.CallbackContext context)
     {

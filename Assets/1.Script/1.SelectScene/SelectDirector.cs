@@ -1,14 +1,19 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 public class SelectDirector : MonoBehaviour
 {
+    const sbyte P1_WINDOW = 0, P2_WINDOW = 1, P3_WINDOW = 2, P4_WINDOW = 3;
+
     [SerializeField] PlayerJoinManager joinManager;
     [SerializeField] PlayerWindowController[] playerWindows;
+    [SerializeField] Animator gameStartUI;
     [SerializeField] GameObject[] playerFrames;
     [SerializeField] CharaIconsController charaIconsCtr;
     [SerializeField] float backBtnHoldTime;
+    [SerializeField] Image backArrow;
     [SerializeField] Animator hideTransition;
     [SerializeField] int fadeTime;
 
@@ -22,6 +27,10 @@ public class SelectDirector : MonoBehaviour
     {
         joinManager.Init();
         joinManager.OnPlayerJoined += JoinPlayer;
+
+        // BGM再生
+        SoundManager.Instance.BGMPlay(BGM.SELECT);
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         int maxPlayer = ProjectManager.MaxPlayer;
 
@@ -54,7 +63,9 @@ public class SelectDirector : MonoBehaviour
 
             if (type == PlayerType.PLAYER) JoinPlayer(i, type, i); // 人間なら
             else playerWindows[i].JoinPlayer(type, 0); // CPUなら
+
             AcceptCharaID(i, charaIDs[i]);
+            if(type == PlayerType.CPU) playerWindows[i].SetActiveAccessPlayerIcon(0, false, false);
         }
     }
     private void OnDisable()
@@ -97,6 +108,12 @@ public class SelectDirector : MonoBehaviour
             // 全員決まっていたら、次のシーンへ
             if(IsAllAccept() && data.START) NextScene();
         }
+
+        // 戻るボタンホールド 矢印のゲージアニメーション
+        BackArrowDisp();
+
+        // キャラ選択中の枠がないか確認 ゲームスタートUIの表示,非表示
+        gameStartUI.SetBool("GameStart",IsAllAccept());
     }
 
     // =======================================================
@@ -114,8 +131,6 @@ public class SelectDirector : MonoBehaviour
         playerWindows[index].JoinPlayer(_playerType, controllerNum);
 
         cntrlTargetWindow[controllerNum] = index;
-        playerFrames[controllerNum].SetActive(true);
-        playerFrames[controllerNum].transform.position = playerWindows[index].transform.position;
     }
 
     /// <summary>
@@ -133,12 +148,14 @@ public class SelectDirector : MonoBehaviour
         var type = playerWindows[index].GetPlayerType();
         playerWindows[index].PlayerNone();
 
+        SoundManager.Instance.SEPlay(SE.BACK);
+
         // 対象がプレイヤーかどうか
         if (type != PlayerType.PLAYER) return;
         // プレイヤーなら --------------------------------
-        
-        // プレイヤーが操作する枠を消す
-        playerFrames[playerNum].SetActive(false);
+
+        // プレイヤーが操作するアイコンを消す
+        playerWindows[index].SetActiveAccessPlayerIcon(playerNum, false, false);
 
         // コントローラーを削除する
         joinManager.OnLeft(playerNum);
@@ -165,26 +182,27 @@ public class SelectDirector : MonoBehaviour
     void MoveWindow(SelectScene.InputData data, int index)
     {
         var targetWindowNum = cntrlTargetWindow[index];
+        playerWindows[targetWindowNum].SetActiveAccessPlayerIcon(index, false, false);
         var dir = data.DIRECTION_DATA;
 
         switch (targetWindowNum)
         {
-            case 0: // 1Pウィンドウなら
+            case P1_WINDOW: // 1Pウィンドウなら
                 if (dir.HasFlag(DIRECTIONDATA.RIGHT)) targetWindowNum++;
                 if (dir.HasFlag(DIRECTIONDATA.DOWN)) targetWindowNum += 2;
                 break;
 
-            case 1: // 2Pウィンドウなら
+            case P2_WINDOW: // 2Pウィンドウなら
                 if (dir.HasFlag(DIRECTIONDATA.LEFT)) targetWindowNum--;
                 if (dir.HasFlag(DIRECTIONDATA.DOWN)) targetWindowNum += 2;
                 break;
 
-            case 2: // 3Pウィンドウなら
+            case P3_WINDOW: // 3Pウィンドウなら
                 if (dir.HasFlag(DIRECTIONDATA.RIGHT)) targetWindowNum++;
                 if (dir.HasFlag(DIRECTIONDATA.UP)) targetWindowNum -= 2;
                 break;
 
-            case 3: // 4Pウィンドウなら
+            case P4_WINDOW: // 4Pウィンドウなら
                 if (dir.HasFlag(DIRECTIONDATA.LEFT)) targetWindowNum--;
                 if (dir.HasFlag(DIRECTIONDATA.UP)) targetWindowNum -= 2;
                 break;
@@ -192,8 +210,11 @@ public class SelectDirector : MonoBehaviour
             default: break;
         }
 
+        // SE再生
+        if (targetWindowNum != cntrlTargetWindow[index]) SoundManager.Instance.SEPlay(SE.CURSOR_MOVE);
+
         cntrlTargetWindow[index] = targetWindowNum;
-        playerFrames[index].transform.position = playerWindows[targetWindowNum].transform.position;
+        playerWindows[targetWindowNum].SetActiveAccessPlayerIcon(index, true, false);
     }
 
     // キャラ選択 決定
@@ -202,23 +223,23 @@ public class SelectDirector : MonoBehaviour
         playerWindows[index].Accept(id);
         charaIconsCtr.Accept(index);
 
-        // キャラ選択中の枠がないか確認
-        if (IsAllAccept()) { }
+        SoundManager.Instance.SEPlay(SE.CHARA_ACCEPT);
     }
 
     // 全員キャラ選択が決まったかどうか
     bool IsAllAccept()
     {
-        bool flag = true;
-
-        // ひとりも参加していない、ダメ
-        if (playerWindows[0].GetCharaID() < 0) flag = false;
+        int count = 0;
 
         // ひとりでも選択中なら、ダメ
         foreach (var window in playerWindows)
-            if (window.IsSelectNow()) { flag = false; break; }
+            if (window.IsSelectNow()) return false;
 
-        return flag;
+        // ひとりも参加していない、ダメ
+        foreach (var window in playerWindows)
+            if (window.GetCharaID() >= 0) count++;
+
+        return count >= 2; // 2人以上の参加
     }
 
     // 次のシーンへ進む
@@ -247,6 +268,8 @@ public class SelectDirector : MonoBehaviour
         Debug.Log("次のシーンへ");
 
         hideTransition.SetTrigger("Show");
+
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         await Task.Delay(fadeTime);
 
@@ -295,9 +318,25 @@ public class SelectDirector : MonoBehaviour
 
         hideTransition.SetTrigger("Show");
 
+        SoundManager.Instance.SEPlay(SE.MEKURU);
+
         await Task.Delay(fadeTime);
 
         // 次のシーンへ（予約済みのシーンへ）
         ProjectManager.Instance.ChangeScene(SceneName.TitleScene);
+    }
+
+    void BackArrowDisp()
+    {
+        // 一番長いホールド時間を取得
+        float time = 0f;
+        foreach(var _time in countHoldTime)
+        {
+            if (_time <= time) continue;
+
+            time = _time;
+        }
+
+        backArrow.fillAmount = time / backBtnHoldTime;
     }
 }
