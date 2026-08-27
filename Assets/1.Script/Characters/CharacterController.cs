@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 
@@ -32,7 +33,7 @@ public enum ATTACK_STATE
 
 
 /// <summary>
-/// キャラクター自信
+/// キャラクター自身
 /// </summary>
 public class CharacterController : MonoBehaviour
 {
@@ -40,6 +41,8 @@ public class CharacterController : MonoBehaviour
     [SerializeField] protected Animator anim;
     [SerializeField] public CharacterData charaData;
     [SerializeField] protected CapsuleCollider2D capsuleCol;
+    [SerializeField] CharaTransition transitionAnim;
+    [SerializeField] GameObject shieldObject;
 
     public CharacterStateBase nowState;
 
@@ -103,29 +106,40 @@ public class CharacterController : MonoBehaviour
     /// </summary>
     public void Init(int _playerNum,ColliderManager _colManager)
     {
+        //プレイヤー番号を挿入
         playerNum = _playerNum;
 
+        //コライダーマネージャーを取得
         colManager= _colManager;
 
+        //キャラクターの情報を挿入
         speed = charaData.moveSpeed;
         maxHp = charaData.maxHp;
         hp = maxHp;
         jumpForce = charaData.jumpForce;
-
         maxShield = charaData.maxShield;
         shieldValue = maxShield;
 
+        //当たり判定をデフォルトに設定
         HitBoxDefaultSet();
 
-
+        //押し出しコライダーの初期設定
         CircleColData _pushBox = new();
         _pushBox.localPos = Vector3.zero;
         _pushBox.radius = 0.5f;
         _pushBox.trans = gameObject.transform;
 
-        List<CircleColData> hitboxList = new();
+        //押し出しコライダーを生成
         pushBox = colManager.UpdatePushBoxColliderData(_pushBox, this);
 
+
+
+        List<CircleColData> hitboxList = new();
+
+        //攻撃ステート情報スクリプトを取得
+        CharacterAttackStateList atkState=GetComponent<CharacterAttackStateList>();
+
+        //各ステートの情報を挿入
         stateDictionary = new Dictionary<CHARA_STATE, CharacterStateBase>()
         {
             {CHARA_STATE.idle,     new IdleState()    },
@@ -134,14 +148,15 @@ public class CharacterController : MonoBehaviour
             {CHARA_STATE.air,      new AirState()     },
             {CHARA_STATE.stan,     new StanState()    },
             {CHARA_STATE.shield,   new ShieldState()  },
-            {CHARA_STATE.atkLeft,  new NarboLeftAttackState()  },
-            {CHARA_STATE.atkRight, new NarboRightAttackState()  },
-            {CHARA_STATE.atkUp,    new NarboUpAttackState()  },
-            {CHARA_STATE.atkDown,  new NarboDownAttackState()  },
+            {CHARA_STATE.atkLeft,  atkState.GetLeftAtkState },
+            {CHARA_STATE.atkRight, atkState.GetRightAtkState},
+            {CHARA_STATE.atkUp,    atkState.GetUpAtkState   },
+            {CHARA_STATE.atkDown,  atkState.GetDownAtkState },
             
         };
 
 
+        //各ステートに初回情報を挿入
         foreach (var state in stateDictionary)
         {
             state.Value.StateInit(this, anim);
@@ -161,6 +176,7 @@ public class CharacterController : MonoBehaviour
         nowState = stateDictionary[CHARA_STATE.idle];
         nowState.StateStart();
 
+        transitionAnim.Init(playerNum);
     }
 
 
@@ -548,14 +564,21 @@ public class CharacterController : MonoBehaviour
     /// </summary>
     private void Dead()
     {
+        DeadAnim();
+
         HitBoxReset();
         PushBoxReset();
 
         isDead = true;
         nowState.StateEnd();
-        gameObject.SetActive(false);
 
         OnDead?.Invoke(playerNum, this);
+    }
+    async void DeadAnim()
+    {
+        TransitionAnim("Hide");
+        await Task.Delay(1000);
+        gameObject.SetActive(false);
     }
 
 
@@ -635,7 +658,24 @@ public class CharacterController : MonoBehaviour
     public CHARA_STATE State() => state;
     public Rigidbody2D GetRigidBody()=> rb;
 
+    public GameObject GetShieldObject() => shieldObject;
 
+    public int GetPNum() => playerNum;
+
+    /// <summary>
+    /// 現在のシールド割合を取得する
+    /// </summary>
+    /// <returns></returns>
+    public float GetShieldRatio() =>(float)shieldValue / (float)maxShield;
+
+    /// <summary>
+    /// キャラクターのトランジションアニメーション　登場,退出
+    /// </summary>
+    /// <param name="triggerName"></param>
+    public void TransitionAnim(string triggerName)
+    {
+        transitionAnim.TransitionAnim(triggerName);
+    }
 
 
     //-----------------------------------------------------------------------------------------------状態取得
@@ -662,6 +702,16 @@ public class CharacterController : MonoBehaviour
     /// </summary>
     /// <returns></returns>
     public bool ShieldCheck(){ return inputData.SHIELD; }
+
+
+
+    /// <summary>
+    /// 右方向を向いているか確認する
+    /// </summary>
+    /// <returns></returns>
+    public bool DirectionRightCheck()=> transform.localScale.x > 0; 
+
+
 
 
     /// <summary>
@@ -714,6 +764,8 @@ public class CharacterController : MonoBehaviour
         return false;
     }
 
+
+
     /// <summary>
     /// スタン時間が終了したか確認
     /// </summary>
@@ -735,6 +787,8 @@ public class CharacterController : MonoBehaviour
 
 
     }
+
+    
 }
 
 

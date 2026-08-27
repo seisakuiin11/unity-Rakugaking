@@ -13,15 +13,16 @@ MonoBehaviour:
   m_Name: WasshoiData
   m_EditorClassIdentifier: Assembly-CSharp::AttackData
   AtkDamage: 250
-  AtkHitStanFrame: 60
+  AtkHitStanFrame: 50
   KnockBackData:
-    KnockBackFlip: 0
+  - KnockBackFlip: 0
     Vector: 0
     KnockBackVec: {x: 0, y: 1}
-    KnockBackPower: 15
+    KnockBackPower: 20
   AllFrame: 30
   data:
   - TargetFrame: 0
+    KnockBackNum: 0
     colliders:
     - radius: 1
       localPos: {x: 2, y: 0, z: 0}
@@ -44,5 +45,7 @@ MonoBehaviour:
       trans: {fileID: 0}
       colType: 0
   - TargetFrame: 30
+    KnockBackNum: 0
     colliders: []
   palameters: []
+  prefabs: []

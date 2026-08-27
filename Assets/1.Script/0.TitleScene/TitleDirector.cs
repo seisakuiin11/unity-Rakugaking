@@ -23,15 +23,16 @@ public class TitleDirector : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // BGM再生
+        SoundManager.Instance.BGMPlay(BGM.TITLE);
+
         SetWaitFlag();
 
+        quitUI.SetActive(false);
         titleTransition.gameObject.SetActive(true);
         hideTransition.gameObject.SetActive(true);
         hideTransition.SetTrigger("Hide");
-        quitUI.SetActive(false);
-
-        // BGM再生
-        SoundManager.Instance.BGMPlay(BGM.TITLE);
+        SoundManager.Instance.SEPlay(SE.MEKURU);
     }
 
     // コントローラー起因処理 ===============================================================
@@ -90,6 +91,7 @@ public class TitleDirector : MonoBehaviour
         // アニメーション再生
         hideTransition.gameObject.SetActive(true);
         hideTransition.SetTrigger("Show");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         await Task.Delay(fadeTime);
 
@@ -99,8 +101,6 @@ public class TitleDirector : MonoBehaviour
         // チュートリアルなら、キャラ選択へいかない
         if (scene == SceneName.TutorialScene) ProjectManager.Instance.ChangeScene(scene);
         else ProjectManager.Instance.ChangeScene(SceneName.SelectScene);
-
-        SoundManager.Instance.SEPlay(SE.MEKURU);
     }
 
     /// <summary>
@@ -114,6 +114,10 @@ public class TitleDirector : MonoBehaviour
 
         openQuitUI = active;
         quitUI.SetActive(openQuitUI);
+
+        // SE再生
+        if (active) SoundManager.Instance.SEPlay(SE.SHOW_WINDOW);
+        else SoundManager.Instance.SEPlay(SE.BACK);
 
         if (!active) return;
 

@@ -72,7 +72,7 @@ public class CharacterStateBase
         chara.HPChange(-_damage);
         chara.SetStanFlame(_stanFrame);
         chara.KnockBack(_knockBack, _col);
-  
+        SoundManager.Instance.CharaSEPlay(CHARASE.HIT_1);
     }
 
 
@@ -209,7 +209,7 @@ public class JumpState : CharacterStateBase
         anim.SetTrigger("Jump");
         chara.JumpAction();
         chara.ChangeState(CHARA_STATE.air);
-
+        SoundManager.Instance.CharaSEPlay(CHARASE.JUMP);
         OnJump?.Invoke(chara);
     
     }
@@ -320,16 +320,19 @@ public class StanState : CharacterStateBase
 /// </summary>
 public class ShieldState:CharacterStateBase
 {
+    GameObject shieldObject;
+
     public override void StateInit(CharacterController _chara, Animator _anim)
     {
         base.StateInit(_chara, _anim);
-
+        shieldObject = chara.GetShieldObject();
     }
 
 
     public override void StateStart()
     {
         anim.SetTrigger("Shield");
+        shieldObject.SetActive(true);
     }
 
 
@@ -340,31 +343,48 @@ public class ShieldState:CharacterStateBase
 
         //横滑り防止
         if (chara.GroundCheck()) chara.StopXMove();
-        
-        chara.shieldValue--;
-        if (chara.shieldValue <= 0) {ShieldBreak();return;}
 
+        chara.shieldValue--;
+
+        if (chara.shieldValue <= 0) { ShieldBreak(); return; }
+
+        //シールド処理
+        ShieldObjectProcess();
 
     }
 
+    private void ShieldObjectProcess()
+    {
+        float shieldRatio = chara.GetShieldRatio();
+   
+        shieldObject.transform.localScale = new(shieldRatio,shieldRatio);
+    }
+
+
     private void ShieldBreak()
     {
+        SoundManager.Instance.CharaSEPlay(CHARASE.GUARD_CRASH);
         chara.SetStanFlame(chara.shieldBreakStanFlame);
         chara.KnockBack(chara.shieldBreakKnockBack);
         chara.ChangeState(CHARA_STATE.stan);
+        
     }
 
     public override void Damage(int _damage, int _stanFrame, KnockBackData _knockBackData,Collider _col)
     {
         chara.shieldValue -= (int)(_damage * chara.shieldDamageMultiply);
 
-        if (chara.shieldValue <= 0) { ShieldBreak(); return; }
+        if (chara.shieldValue <= 0) {
+            ShieldBreak(); 
+            return; }
 
+        SoundManager.Instance.CharaSEPlay(CHARASE.GUARD_1);
     }
 
     public override void StateEnd()
     {
         anim.SetBool("Air", false);
+        shieldObject.SetActive(false);
         base.StateEnd();
 
     }
@@ -381,12 +401,14 @@ public class AttackState : CharacterStateBase
     protected int atkAllFrame;　//攻撃の全体フレーム数
 
     protected int targetFrameIndex; //現在のフレームキー番号
+    protected int knockBackNum; //現在のフレームでのノックバック番号
 
     protected List<FrameData> atkFrameData = new();  //フレームデータ
     protected AttackColliderList atkColList = null;　//現在場に出ている自身の攻撃コライダー群
 
     protected AttackData atkData;
     protected ColliderManager colManager;
+ 
 
     public override void StateInit(CharacterController _chara, Animator _anim)
     {
@@ -473,7 +495,8 @@ public class AttackState : CharacterStateBase
         //キーフレームに格納されているデータを収納する
         var colDatas = atkFrameData[targetFrameIndex].colliders;
 
-        
+        knockBackNum= atkFrameData[targetFrameIndex].KnockBackNum ;
+
         List<CircleColData> _atkColList=new();
         List<CircleColData> _hitBoxColList=new();
 
@@ -484,7 +507,7 @@ public class AttackState : CharacterStateBase
             //Transformを格納
             colData.trans = chara.gameObject.transform;
 
-
+            
 
 
             var scaleY =chara.gameObject.transform.localScale.y;
@@ -499,13 +522,13 @@ public class AttackState : CharacterStateBase
                 colData.localPos.z * scaleY
                 );
 
-            Debug.Log(colData.colType);
+         
             if(colData.colType==COLLIDER_TYPE.AttackCol)_atkColList.Add(colData);
             else if(colData.colType==COLLIDER_TYPE.HitBox)_hitBoxColList.Add(colData);
         }
 
 
-        Debug.Log(atkColList);
+        
         //攻撃コライダーの更新、生成
         if (_atkColList != null)
         {
@@ -544,7 +567,7 @@ public class AttackState : CharacterStateBase
     protected virtual void AtkHit(CharacterController chara,Collider col)
     {
        
-       chara.Damage(atkData.AtkDamage, atkData.AtkHitStanFrame, atkData.KnockBackData,col);
+       chara.Damage(atkData.AtkDamage, atkData.AtkHitStanFrame, atkData.KnockBackData[knockBackNum],col);
 
 
         

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59a7e7993de3a74468e7aff3aee542ca, type: 3}
+  m_Name: Incomplete_Data
+  m_EditorClassIdentifier: 
+  maxHp: 10000
+  maxShield: 300
+  moveSpeed: 500
+  jumpForce: 22
+  shieldBreakKnockBack:
+    KnockBackFlip: 0
+    Vector: 0
+    KnockBackVec: {x: 0, y: 1}
+    KnockBackPower: 30
+  animation: {fileID: 9100000, guid: a97ab1ed5e5320d46a0ee89ad0b1b126, type: 2}
+  leftAttackFrameData: {fileID: 11400000, guid: 4a51e4f850249a04bbc81c00a7ba99f9, type: 2}
+  rightAttackFrameData: {fileID: 11400000, guid: e1216ec14400b074a88b474c929ef285, type: 2}
+  upAttackFrameData: {fileID: 11400000, guid: 8de8f309fa7c4a24184a1ae56a51f957, type: 2}
+  downAttackFrameData: {fileID: 11400000, guid: 58a9b47c493a14e48b70704cb1f7b264, type: 2}

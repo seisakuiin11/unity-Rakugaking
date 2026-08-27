@@ -21,6 +21,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - SE_SYSTEM
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 06e49c2e0114a9341a638a2077168e16
+    m_Address: HIT_2
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 072a10b34d4878b42a1c77ad9e0c75da
+    m_Address: SLASHER_SOMERSAULT
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1104cac1aa745124d87b8e483e8dcff7
     m_Address: PLAYER_ENTRY
     m_ReadOnly: 0
@@ -57,11 +69,23 @@ MonoBehaviour:
     m_SerializedLabels:
     - BGM
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 83f2d438d7ae826468c84fdddeb2d53d
+    m_Address: GUARD_CRASH
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8448eefdb95ffbf45933058c7320b4fd
     m_Address: "8\u756A\u30AD\u30E3\u30E9BGM"
     m_ReadOnly: 0
     m_SerializedLabels:
     - BGM
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8a1586fb562c8874c99abb7aebeb2ae0
+    m_Address: NARBO_STRIKE
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9520e26dd414cc249b9546320e03e7fd
     m_Address: SLASHER
@@ -75,6 +99,18 @@ MonoBehaviour:
     m_SerializedLabels:
     - BGM
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 99cb472f4f35c074d97e198ce73574d6
+    m_Address: NARBO_WASHOI
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9e78db468e3f59e42ae93ab00daa78ba
+    m_Address: SLASHER_DIVESOBAT
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 9ee93c49c54d5504a9362028d894a9b7
     m_Address: BATTLE_END
     m_ReadOnly: 0
@@ -87,11 +123,35 @@ MonoBehaviour:
     m_SerializedLabels:
     - BGM
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ae53c78592fb9de419b38a045e4c10a4
+    m_Address: NARBO_ZINARASI
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c26e2ad3df9af6749a816e0baccf294f
+    m_Address: GUARD_1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: c491236276fd4324899e6585ba975722
     m_Address: RESULT
     m_ReadOnly: 0
     m_SerializedLabels:
     - BGM
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c5de2b0ea3a4fd1448f9699fcc279763
+    m_Address: JUMP
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c8e957ce0102ada4aa46dc935b314018
+    m_Address: NARBO_DAIBAKUHATU
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d127b2675608db249be7e5b9bc788409
     m_Address: BACK
@@ -99,11 +159,29 @@ MonoBehaviour:
     m_SerializedLabels:
     - SE_SYSTEM
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d1e057b59b3adc44eb75a420d639eaa1
+    m_Address: SLASHER_KERIAGE
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d38389a6238e2924e9111b913021a7a3
     m_Address: MEKURU
     m_ReadOnly: 0
     m_SerializedLabels:
     - SE_SYSTEM
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d8e5ccedf708ae8469ac9cc1d9a2be24
+    m_Address: HIT_1
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: da6f6edb89990b841bfe2ab0f0dfdf13
+    m_Address: SLASHER_ACCEL
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - SE_CHARA
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: db520b58100e26b418edd00456c5311c
     m_Address: TITLE_ENTER

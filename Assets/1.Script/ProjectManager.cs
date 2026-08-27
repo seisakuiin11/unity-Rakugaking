@@ -5,7 +5,7 @@ using System.Linq;
 /// <summary>
 /// いない、プレイヤー、CPUを判別する
 /// </summary>
-public enum PlayerType
+public enum PlayerType : byte
 {
     NONE,
     PLAYER,

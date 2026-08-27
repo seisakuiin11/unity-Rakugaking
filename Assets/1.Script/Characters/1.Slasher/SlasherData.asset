@@ -24,5 +24,5 @@ MonoBehaviour:
   animation: {fileID: 0}
   leftAttackFrameData: {fileID: 11400000, guid: fc2abd0ba118a0f4c9245a2c9604f7b4, type: 2}
   rightAttackFrameData: {fileID: 11400000, guid: f036799e39a0d7648b7aa2e9898d2165, type: 2}
-  upAttackFrameData: {fileID: 0}
+  upAttackFrameData: {fileID: 11400000, guid: a5f4c3f863c0a5a4c8ca146b60dfe20e, type: 2}
   downAttackFrameData: {fileID: 11400000, guid: 878cd22d2d3f89a4a952227a956d278f, type: 2}

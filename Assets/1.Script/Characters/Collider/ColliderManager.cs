@@ -177,17 +177,7 @@ public class ColliderManager : MonoBehaviour
                 Gizmos.DrawWireSphere(col.colData.worldPos, col.colData.radius);
         }
 
-        Gizmos.color = Color.yellow;
-       ;
-
-        foreach (AttackColliderList colList in attackColList)
-        {
-            foreach (Collider_Circle col in colList.circleColList)
-            {
-                var vec = new Vector3(col.colData.LocalPos.x, col.colData.LocalPos.y, col.colData.LocalPos.z);
-                Gizmos.DrawWireSphere(col.colData.worldPos - vec, col.colData.radius + 2);
-            } 
-        }
+     
 
 
         Gizmos.color = Color.cyan;

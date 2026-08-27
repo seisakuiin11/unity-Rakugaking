@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class SelectDirector : MonoBehaviour
 {
-    const sbyte P1_WINDOW = 0, P2_WINDOW = 1, P3_WINDOW = 2, P4_WINDOW = 3;
+    const byte P1_WINDOW = 0, P2_WINDOW = 1, P3_WINDOW = 2, P4_WINDOW = 3;
 
     [SerializeField] PlayerJoinManager joinManager;
     [SerializeField] PlayerWindowController[] playerWindows;
@@ -30,7 +30,6 @@ public class SelectDirector : MonoBehaviour
 
         // BGM再生
         SoundManager.Instance.BGMPlay(BGM.SELECT);
-        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         int maxPlayer = ProjectManager.MaxPlayer;
 
@@ -49,6 +48,7 @@ public class SelectDirector : MonoBehaviour
         // トランジション再生
         hideTransition.gameObject.SetActive(true);
         hideTransition.SetTrigger("Hide");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         // すでにコントローラーが登録されており、キャラも選択していたら ==========
         if (joinManager.GetDeviceCount() <= 0) return;
@@ -305,6 +305,8 @@ public class SelectDirector : MonoBehaviour
         // 入力に関する処理をすべて止める
         stopProcess = true;
 
+        SoundManager.Instance.SEPlay(SE.BACK);
+
         // コントローラーをすべて削除する
         for(int i = 0; i < playerWindows.Length; i++)
         {
@@ -317,7 +319,6 @@ public class SelectDirector : MonoBehaviour
         Debug.Log("前のシーンへ");
 
         hideTransition.SetTrigger("Show");
-
         SoundManager.Instance.SEPlay(SE.MEKURU);
 
         await Task.Delay(fadeTime);

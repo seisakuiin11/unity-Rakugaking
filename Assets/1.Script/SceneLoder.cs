@@ -5,10 +5,10 @@ using UnityEngine.SceneManagement;
 public enum SceneName
 {
     TitleScene,
+    TutorialScene,
     SelectScene,
     GameScene,
     TrainingScene,
-    TutorialScene,
     ResultScene,
     JoinScene,
     TestScene

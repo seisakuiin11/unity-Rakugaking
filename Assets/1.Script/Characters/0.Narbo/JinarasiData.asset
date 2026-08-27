@@ -15,13 +15,14 @@ MonoBehaviour:
   AtkDamage: 500
   AtkHitStanFrame: 30
   KnockBackData:
-    KnockBackFlip: 2
+  - KnockBackFlip: 2
     Vector: 0
     KnockBackVec: {x: 0.5, y: 0.5}
-    KnockBackPower: 40
+    KnockBackPower: 20
   AllFrame: 40
   data:
   - TargetFrame: 20
+    KnockBackNum: 0
     colliders:
     - radius: 1.5
       localPos: {x: 1, y: 0, z: 0}
@@ -48,5 +49,7 @@ MonoBehaviour:
       trans: {fileID: 0}
       colType: 1
   - TargetFrame: 40
+    KnockBackNum: 0
     colliders: []
   palameters: []
+  prefabs: []

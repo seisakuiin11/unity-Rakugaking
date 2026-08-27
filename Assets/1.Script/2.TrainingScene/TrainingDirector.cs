@@ -18,7 +18,7 @@ public class TrainingDirector : MonoBehaviour
     CharacterController[] characters;
 
     GAMESTATE gameState;
-    enum GAMESTATE
+    enum GAMESTATE : byte
     {
         WAIT,
         PLAYING,
@@ -36,13 +36,10 @@ public class TrainingDirector : MonoBehaviour
         // プレイヤー管理者のアップデート処理
         playersController.UpdateMethod();
 
-        //コライダーコントローラーのアップデート管理
-        colManager.UpdateMethod();
-
         // UIのアップデート処理
         gameUIController.UpdateMethod(characters);
 
-        if (gameState == GAMESTATE.PAUSE) return;
+        if (gameState != GAMESTATE.PLAYING) return;
 
         // 一フレーム
         float delta = Time.deltaTime;
@@ -50,7 +47,8 @@ public class TrainingDirector : MonoBehaviour
         // キャラクターのアップデート処理
         foreach (var character in characters) character.UpdateMethod(delta);
 
-        Judge();
+        //コライダーコントローラーのアップデート管理
+        colManager.UpdateMethod();
     }
 
     /*** ==================================================================================== ***/
@@ -58,6 +56,9 @@ public class TrainingDirector : MonoBehaviour
     // ゲーム開始の準備
     async void GameStanby()
     {
+        // BGM 再生
+        SoundManager.Instance.BGMPlay(BGM.SELECT);
+
         // コントローラーをGame用に変える
         ControllerInputManager.Instance.ChangeInputMode(INPUT_MODE.player);
 
@@ -99,20 +100,14 @@ public class TrainingDirector : MonoBehaviour
 
         // トランジション
         hideTransition.SetTrigger("Hide");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
+
+        // キャラの登場アニメーション
+        foreach (var chara in characters) chara.TransitionAnim("Show");
 
         await Task.Delay(fadeTime);
 
         gameState = GAMESTATE.PLAYING;
-    }
-
-    // 勝者が誕生したかジャッジする
-    void Judge()
-    {
-        int aliveCount = 0;
-        // 生存者を確認
-        foreach (var character in characters) if (!character.GetIsDead()) aliveCount++;
-
-        // if (aliveCount <= 1) GameEnd();
     }
 
     // ゲームを終了 -> 選択画面へ
@@ -131,6 +126,7 @@ public class TrainingDirector : MonoBehaviour
 
         // トランジション再生 画面を隠す
         hideTransition.SetTrigger("Show");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         await Task.Delay(fadeTime);
 
@@ -171,5 +167,6 @@ public class TrainingDirector : MonoBehaviour
         character.Revive();
         character.transform.position = revivePos;
         gameUIController.ChangeHP(num, character.GetHP());
+        character.TransitionAnim("Show");
     }
 }

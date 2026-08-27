@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,6 +19,14 @@ public class GameUIController : MonoBehaviour
     [SerializeField] float playerNumberShiftPosY;
     [SerializeField] CharaVisualData[] charaVisualDatas;
 
+    [SerializeField, Header("カウントダウンテキスト")]
+    TextMeshProUGUI countDownText;
+
+    private void Awake()
+    {
+        if(countDownText != null)
+            countDownText.gameObject.SetActive(false);
+    }
 
     /// <summary>
     /// 初期化
@@ -31,15 +41,13 @@ public class GameUIController : MonoBehaviour
 
         // キャラアイコン 生成
         var harfWidth = (_characters.Length - 1) * charaUIDisSpace * 0.5f;
+        var charaIDs = ProjectManager.Instance.GetCharaIDs();
         for(int i = 0; i < _characters.Length; i++)
         {
-            int charaID = 0;    // *** 仮 ***
             charaUIs[i].gameObject.SetActive(true);
             charaUIs[i].transform.Translate(i * charaUIDisSpace - harfWidth, 0, 0);  // ポジション設定
-            charaUIs[i].Init(charaVisualDatas[charaID].BustUp, _characters[i].GetHP());
+            charaUIs[i].Init(charaIDs[i], _characters[i].GetHP());
             _characters[i].OnDamage += ChangeHP;
-
-            playerNumbers[i].SetActive(true);
         }
 
         pauseUI.SetActive(false);
@@ -88,9 +96,11 @@ public class GameUIController : MonoBehaviour
     {
         pauseUI.SetActive(flag);
 
-        if (!flag) return;
+        // SE再生
+        if (flag) SoundManager.Instance.SEPlay(SE.SHOW_WINDOW);
+        else SoundManager.Instance.SEPlay(SE.BACK);
 
-        if (pauseUI_btn == null) return;
+        if (!flag) return;
 
         eventSystem.SetSelectedGameObject(pauseUI_btn);
     }
@@ -103,5 +113,29 @@ public class GameUIController : MonoBehaviour
     public void ChangeHP(int index, int value)
     {
         charaUIs[index].ChangeHPValue(value);
+    }
+
+    /// <summary>
+    /// カウントダウンアニメーション
+    /// </summary>
+    /// <param name="count"></param>
+    public async void CountDownText(int count)
+    {
+        if (countDownText == null) return;
+
+        countDownText.gameObject.SetActive(true);
+
+        for (int i = count; i > 0; i--)
+        {
+            countDownText.text = i.ToString();
+
+            await Task.Delay(1000);
+        }
+
+        countDownText.text = "たたかえ!!";
+
+        await Task.Delay(1000);
+
+        countDownText.gameObject.SetActive(false);
     }
 }

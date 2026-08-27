@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class CharacterCreater : MonoBehaviour
 {
-    [Header("キャラクター プレハブ")]
-    [SerializeField] CharacterController charPrefab;
     [Header("生成の基準点")]
     [SerializeField] Vector3 createCenterPos;
     [Header("生成した時のキャラクター同士の距離")]
@@ -27,7 +25,8 @@ public class CharacterCreater : MonoBehaviour
         // 指定人数分生成する
         for(int i  = 0; i < num; i++)
         {
-            var obj = Instantiate(charPrefab);  // 生成
+            var prefab = CharaDataManager.Instance.GetCharaPrefab(charaIDs[i]); // Prefabを取得
+            var obj = Instantiate(prefab);  // 生成
             obj.transform.position = createCenterPos;   // 原点
             obj.transform.Translate((createDistance * i) - harfLength, 0, 0); // ずらす
             characters[i] = obj;

@@ -8,6 +8,8 @@ public class GameDirector : MonoBehaviour
     [SerializeField] int fadeTime;
     [SerializeField] int waitFadeTime;
 
+    [SerializeField] int CountDownNum = 3;
+
     [SerializeField] GameUIController gameUIController;
     [SerializeField] PlayersController playersController;
     [SerializeField] CpuController cpuController;
@@ -17,7 +19,7 @@ public class GameDirector : MonoBehaviour
     CharacterController[] characters;
 
     GAMESTATE gameState;
-    enum GAMESTATE
+    enum GAMESTATE : byte
     {
         WAIT,
         PLAYING,
@@ -35,13 +37,10 @@ public class GameDirector : MonoBehaviour
         // プレイヤー管理者のアップデート処理
         playersController.UpdateMethod();
 
-        //コライダーコントローラーのアップデート管理
-        colManager.UpdateMethod();
-
         // UIのアップデート処理
         gameUIController.UpdateMethod(characters);
 
-        if (gameState == GAMESTATE.PAUSE) return;
+        if (gameState != GAMESTATE.PLAYING) return;
 
         // 一フレーム
         float delta = Time.deltaTime;
@@ -51,6 +50,9 @@ public class GameDirector : MonoBehaviour
 
         // キャラクターのアップデート処理
         foreach (var character in characters) character.UpdateMethod(delta);
+
+        //コライダーコントローラーのアップデート管理
+        colManager.UpdateMethod();
 
         Judge();
     }
@@ -63,8 +65,14 @@ public class GameDirector : MonoBehaviour
         // コントローラーをGame用に変える
         ControllerInputManager.Instance.ChangeInputMode(INPUT_MODE.player);
 
-        gameState = GAMESTATE.WAIT;
+        // BGM再生
+        SoundManager.Instance.BGMPlay(BGM.NARBO);
+        SoundManager.Instance.SEPlay(SE.BATTLE_START);
+
+        // トランジション
         hideTransition.gameObject.SetActive(true);
+        hideTransition.SetTrigger("Hide");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         // キャラクター生成
         int maxPlayer = ProjectManager.Instance.MaxGamePlayerCount(); // (プレイヤー+エネミー)
@@ -98,15 +106,17 @@ public class GameDirector : MonoBehaviour
         // UI管理者の初期化処理
         gameUIController.Init(characters);
 
-        // BGM再生
-        SoundManager.Instance.BGMPlay(BGM.NARBO);
-        SoundManager.Instance.SEPlay(SE.BATTLE_START);
+        // カウントダウン
+        gameUIController.CountDownText(CountDownNum);
 
-        
-        // トランジション
-        hideTransition.SetTrigger("Hide");
+        gameState = GAMESTATE.WAIT;
 
-        await Task.Delay(fadeTime);
+        await Task.Delay(fadeTime); // 画面遷移待ち
+
+        // キャラクターの表示
+        foreach (var chara in characters) chara.TransitionAnim("Show");
+
+        await Task.Delay(CountDownNum * 1000);
 
         gameState = GAMESTATE.PLAYING;
     }
@@ -129,14 +139,24 @@ public class GameDirector : MonoBehaviour
 
         gameState = GAMESTATE.WAIT;
 
+       
+       
+
         playersController.OnPause -= Pause;
         gameUIController.GameEnd(characters);
 
-        // 勝者を記録する
+       
         for (int i = 0; i < characters.Length; i++)
         {
+
+
+            // 勝者ではない場合次へ
             if (characters[i].GetIsDead()) continue;
 
+
+            //キャラクターのrigidbodyを止める
+            characters[i].StopXMove();
+           
             ProjectManager.Instance.SetWinner(i);
         }
 
@@ -148,6 +168,7 @@ public class GameDirector : MonoBehaviour
 
         // トランジション再生 画面を隠す
         hideTransition.SetTrigger("Show");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         await Task.Delay(fadeTime);
 
@@ -172,6 +193,7 @@ public class GameDirector : MonoBehaviour
 
         // トランジション再生 画面を隠す
         hideTransition.SetTrigger("Show");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         await Task.Delay(fadeTime);
 

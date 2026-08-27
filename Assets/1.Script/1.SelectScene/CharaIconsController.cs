@@ -1,4 +1,3 @@
-using SelectScene;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +10,6 @@ public class CharaIconsController : MonoBehaviour
     [SerializeField] Transform charaIconParent; // キャラアイコンの生成先
     [SerializeField] Image[] iconFrames;        // 各プレイヤーが操作する枠（選択キャラアイコンをわかりやすくするため）
     [SerializeField] float iconDisSpace;        // キャラアイコン生成時の間の距離
-    [SerializeField] CharaVisualData[] charaVisuals;
 
     public event Action<int, int> OnAccepted;
 
@@ -26,13 +24,15 @@ public class CharaIconsController : MonoBehaviour
     public void Init()
     {
         // キャラアイコンの生成
-        charaIcons = new Image[charaVisuals.Length];
-        float harfWidth = (charaVisuals.Length - 1) * iconDisSpace * 0.5f;
-        for (int i = 0; i < charaVisuals.Length; i++)
+        var visuals = CharaDataManager.Instance.GetAllVisualDatas();
+
+        charaIcons = new Image[visuals.Length];
+        float harfWidth = (visuals.Length - 1) * iconDisSpace * 0.5f;
+        for (int i = 0; i < visuals.Length; i++)
         {
             charaIcons[i] = Instantiate(charaIconPrefab, charaIconParent);          // 生成
             charaIcons[i].transform.Translate(i * iconDisSpace - harfWidth, 0, 0);  // ポジション設定
-            charaIcons[i].sprite = charaVisuals[i].Icon;                            // sprite設定
+            charaIcons[i].sprite = visuals[i].Icon;                                 // sprite設定
         }
         charaIconPrefab.gameObject.SetActive(false); // プレハブは消す
 
@@ -49,31 +49,33 @@ public class CharaIconsController : MonoBehaviour
     /// <param name="playerType">人間orCPU</param>
     /// <param name="controllerIndex">何番目のコントローラー</param>
     /// <param name="id">キャラID</param>
-    public Sprite SelectCharacter(PlayerType playerType, int controllerIndex, int id = 0)
+    public void SelectCharacter(PlayerType playerType, int controllerIndex, int id = 0)
     {
         // フレームのアクティブ化　対応Indexに格納
-        frames[controllerIndex] = playerType == PlayerType.PLAYER ? iconFrames[controllerIndex] : iconFrames[MaxPlayerCount]; // プレイヤー用のフレームorCPU用フレーム
+        frames[controllerIndex] = playerType == PlayerType.PLAYER ? iconFrames[controllerIndex] : iconFrames[MaxPlayerCount + controllerIndex]; // プレイヤー用のフレームorCPU用フレーム
         frames[controllerIndex].gameObject.SetActive(true);
         FrameMove(controllerIndex, id);
-
-        return charaVisuals[id].BustUp;
     }
 
     /// <summary>
-    /// 入力情報から、選択中のキャライラストを返す
+    /// 入力情報から、選択中のキャラIDを返す
     /// </summary>
     /// <returns></returns>
-    public Sprite Process(int controllerIndex, SelectScene.InputData inputData)
+    public int Process(int controllerIndex, SelectScene.InputData inputData)
     {
         int num = framesPosNum[controllerIndex];
 
         // 左入力があれば
-        if (inputData.DIRECTION_DATA.HasFlag(DIRECTIONDATA.LEFT) && !inputData.DIRECTION_DATA_OLD.HasFlag(DIRECTIONDATA.LEFT))
+        if (inputData.DIRECTION_DATA.HasFlag(DIRECTIONDATA.LEFT) && !inputData.DIRECTION_DATA_OLD.HasFlag(DIRECTIONDATA.LEFT)) { 
             num = num == 0 ? charaIcons.Length - 1 : num - 1;
+            SoundManager.Instance.SEPlay(SE.CURSOR_MOVE);
+        }
 
         // 右入力があれば
-        if (inputData.DIRECTION_DATA.HasFlag(DIRECTIONDATA.RIGHT) && !inputData.DIRECTION_DATA_OLD.HasFlag(DIRECTIONDATA.RIGHT))
+        if (inputData.DIRECTION_DATA.HasFlag(DIRECTIONDATA.RIGHT) && !inputData.DIRECTION_DATA_OLD.HasFlag(DIRECTIONDATA.RIGHT)) {
             num = (num + 1) % charaIcons.Length;
+            SoundManager.Instance.SEPlay(SE.CURSOR_MOVE);
+        }
 
         // 決定なら
         if (inputData.ACCEPT) { Debug.Log("決定"); OnAccepted?.Invoke(controllerIndex, framesPosNum[controllerIndex]); }
@@ -81,7 +83,7 @@ public class CharaIconsController : MonoBehaviour
         // ポジション移動
         FrameMove(controllerIndex, num);
 
-        return charaVisuals[num].BustUp;
+        return num;
     }
 
     // フレームの位置を変える

@@ -92,8 +92,11 @@ public class PlayersController : MonoBehaviour
         data.ATTACK_UP = _data.ATTACK_UP.now;
         data.ATTACK_UP_OLD = _data.ATTACK_UP.past;
         data.ATTACK_DOWN = _data.ATTACK_DOWN.now;
+        data.ATTACK_DOWN_OLD = _data.ATTACK_DOWN.past;
         data.ATTACK_LEFT = _data.ATTACK_LEFT.now;
+        data.ATTACK_LEFT_OLD = _data.ATTACK_LEFT.past;
         data.ATTACK_RIGHT = _data.ATTACK_RIGHT.now;
+        data.ATTACK_RIGHT = _data.ATTACK_RIGHT.past;
         data.SHIELD=_data.SHIELD.now;
         pause = _data.PAUSE;
 

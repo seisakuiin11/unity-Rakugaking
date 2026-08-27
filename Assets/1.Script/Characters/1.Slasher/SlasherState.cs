@@ -1,7 +1,6 @@
-using System.Runtime.CompilerServices;
-using System.Xml.Serialization;
+
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 /// <summary>
 /// サマーソルト～ブレイクスルー
@@ -9,6 +8,8 @@ using UnityEngine.UIElements;
 public class SlasherLeftAttackState: AttackState
 {
     private bool breakthroughFlag;
+    private bool breakthroughfirstFlag;
+    private float gravityScale;
 
 
     public override void StateInit(CharacterController _chara, Animator _anim)
@@ -21,8 +22,10 @@ public class SlasherLeftAttackState: AttackState
     {
         base.StateStart();
         anim.SetTrigger("AttackLeft");
-
+        chara.JumpAction();
+        SoundManager.Instance.CharaSEPlay(CHARASE.SLASHER_SOMERSAULT);
         breakthroughFlag = false;
+        breakthroughfirstFlag = false;
     }
 
     public override void StateUpdateMethod(InputCommandData _inputData)
@@ -36,7 +39,7 @@ public class SlasherLeftAttackState: AttackState
         inputData = _inputData;
 
         //派生チェック
-        if (breakthroughFlag == false) breakthroughFlag = ButtonTapCheck();
+        if (!breakthroughFlag) breakthroughFlag = ButtonTapCheck();
 
         AttackAction();
       
@@ -55,23 +58,39 @@ public class SlasherLeftAttackState: AttackState
         {
             AtkEnd();
         }
-        else
+
+        else if(atkNowFrame >= atkData.palameters[0].value && breakthroughFlag &&!breakthroughfirstFlag)
         //押されていた場合派生技開始
         {
             //派生アニメーション再生
+            anim.SetTrigger("Breakthrough");
+            SoundManager.Instance.CharaSEPlay(CHARASE.SLASHER_BREAKTHROUGH);
+            breakthroughfirstFlag=true;
 
+            // 重力を消し、空中にとどまる
+            gravityScale = chara.GetRigidBody().gravityScale;
+            chara.GetRigidBody().gravityScale = 0f;
+            chara.GetRigidBody().linearVelocity = Vector2.zero;
+           
         }
 
         //現在のフレーム数が全体フレーム以上になったら攻撃終了
         if (atkNowFrame >= atkAllFrame)
         {
+            // 重力を戻す
+            chara.GetRigidBody().gravityScale = gravityScale;
+
             AtkEnd();
             return;
 
         }
 
         //現在のターゲットフレームが存在しない場合は何もしない
-        if (targetFrameIndex > atkFrameData.Count) return;
+        if (targetFrameIndex > atkFrameData.Count) 
+        {
+            Debug.Log("ターゲットフレームなし");
+            return;
+        }
 
         //現在のフレーム数がキーフレームの値以上になったらコライダー情報を更新
         if (atkNowFrame >= atkFrameData[targetFrameIndex].TargetFrame)
@@ -88,7 +107,10 @@ public class SlasherLeftAttackState: AttackState
 
     private bool ButtonTapCheck()
     {
-        if (inputData.ATTACK_LEFT && !inputData.ATTACK_LEFT_OLD) return true;
+        if (inputData.ATTACK_LEFT && !inputData.ATTACK_LEFT_OLD)
+        {
+            return true;
+        }
         return false;
     }
 }
@@ -108,8 +130,9 @@ public class SlasherDownAttackState : AttackState
 {
     public override void StateInit(CharacterController _chara, Animator _anim)
     {
+       
         base.StateInit(_chara, _anim);
-        atkData = chara.charaData.leftAttackFrameData;
+        atkData = chara.charaData.downAttackFrameData;
     }
 
 
@@ -117,7 +140,7 @@ public class SlasherDownAttackState : AttackState
     {
         base.StateStart();
         anim.SetTrigger("AttackDown");
-
+        SoundManager.Instance.CharaSEPlay(CHARASE.SLASHER_KERIAGE);
     }
 
 
@@ -144,7 +167,7 @@ public class SlasherRightAttackState : AttackState
     {
         base.StateStart();
         anim.SetTrigger("AttackRight");
-
+        SoundManager.Instance.CharaSEPlay(CHARASE.SLASHER_DIVESOBAT);
         //初期の方向をキャラの向きに合わせる
         moveDirX = chara.transform.localScale.x;
     }
@@ -171,14 +194,17 @@ public class SlasherRightAttackState : AttackState
 
 
 /// <summary>
-/// アクセル～トルネード
+/// アクセル
 /// </summary>
 public class SlasherUpAttackState : AttackState
 {
+    private bool continueAtkFlag; //百裂を継続するかのフラグ
+
+
     public override void StateInit(CharacterController _chara, Animator _anim)
     {
         base.StateInit(_chara, _anim);
-        atkData = chara.charaData.leftAttackFrameData;
+        atkData = chara.charaData.upAttackFrameData;
     }
 
 
@@ -189,5 +215,137 @@ public class SlasherUpAttackState : AttackState
 
     }
 
+    public override void StateUpdateMethod(InputCommandData _inputData)
+    {
+        inputData= _inputData;
+        base.StateUpdateMethod(inputData);
 
+    }
+    /// <summary>
+    /// 攻撃のフレーム処理
+    /// </summary>
+    protected override void AttackAction()
+    {
+        //フレーム数の加算
+        atkNowFrame++;
+
+        //現在のフレーム数が全体フレーム以上になったら攻撃終了
+        if (atkNowFrame >= atkAllFrame)
+        {
+            AtkEnd();
+            return;
+
+        }
+
+        //現在のターゲットフレームが存在しない場合は何もしない
+        if (targetFrameIndex > atkFrameData.Count) return;
+
+        //連打されているかの確認
+        if (targetFrameIndex <= atkData.palameters[0].value && !continueAtkFlag) continueAtkFlag = RapidTapCheck();
+       
+        //現在のフレーム数がキーフレームの値以上になったらコライダー情報を更新
+        if (atkNowFrame >= atkFrameData[targetFrameIndex].TargetFrame)
+        {
+
+            ColliderAction();
+
+
+            //連打されていた場合百裂を継続する
+            if (targetFrameIndex <= atkData.palameters[0].value && continueAtkFlag) {AttackContinue(); return;}
+           
+            //次のターゲットフレームに変更
+            targetFrameIndex++;
+        }
+
+
+    }
+
+
+
+
+
+    /// <summary>
+    /// コライダー生成、移動
+    /// </summary>
+    protected override void ColliderAction()
+    {
+
+        //キーフレームに格納されているデータを収納する
+        var colDatas = atkFrameData[targetFrameIndex].colliders;
+
+        knockBackNum = atkFrameData[targetFrameIndex].KnockBackNum;
+
+        List<CircleColData> _atkColList = new();
+        List<CircleColData> _hitBoxColList = new();
+
+        //データに格納されているコライダーの数分行われる
+        for (int i = 0; i < colDatas.Count; i++)
+        {
+            var colData = colDatas[i];
+            //Transformを格納
+            colData.trans = chara.gameObject.transform;
+
+
+
+
+            var scaleY = chara.gameObject.transform.localScale.y;
+
+            //サイズを対象のTransform.LocalScaleのY軸に合わせる
+            colData.radius *= chara.gameObject.transform.localScale.y;
+
+            //位置関係を対象のTransform.LocalScaleのY軸に合わせる
+            colData.localPos = new Vector3(
+                colData.localPos.x * scaleY,
+                colData.localPos.y * scaleY,
+                colData.localPos.z * scaleY
+                );
+
+
+            if (colData.colType == COLLIDER_TYPE.AttackCol) _atkColList.Add(colData);
+            else if (colData.colType == COLLIDER_TYPE.HitBox) _hitBoxColList.Add(colData);
+        }
+
+
+     
+        //攻撃コライダーの更新、生成
+        if (_atkColList != null)
+        {
+            if (atkColList != null) colManager.DestroyCircleCol(atkColList);
+            SoundManager.Instance.CharaSEPlay(CHARASE.SLASHER_ACCEL);
+            atkColList = colManager.UpdateAttackColliderData(_atkColList, AtkHit);
+        }
+
+
+        //当たり判定の更新、生成
+        if (_hitBoxColList != null)
+        {
+            chara.HitBoxReset();
+            chara.UpdateHitBoxColliderData(_hitBoxColList);
+        }
+
+    }
+
+
+    private void AttackContinue()
+    {
+
+        
+        targetFrameIndex = (int)atkData.palameters[1].value;
+        atkNowFrame = (int)atkData.palameters[2].value;
+        continueAtkFlag = false;
+
+        //若干後ろに動く（はめ殺し防止のため）
+        Vector2 moveVec = new ();
+        if (chara.DirectionRightCheck()) moveVec.x = -0.1f;
+        else moveVec.x = 0.1f;
+
+        chara.Move(moveVec);
+    }
+
+    private bool RapidTapCheck()
+    {
+
+        if (inputData.ATTACK_UP && !inputData.ATTACK_UP_OLD)  return true;
+        return false;
+    }
 }

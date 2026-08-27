@@ -73,7 +73,7 @@ public class SoundManagerEditor : Editor
 /// <summary>
 /// BGM
 /// </summary>
-public enum BGM
+public enum BGM : byte
 {
     TITLE,
     SELECT,
@@ -120,6 +120,7 @@ public enum CHARASE
     SLASHER_KERIAGE, // スラッシャー ----
     SLASHER_DIVESOBAT,
     SLASHER_SOMERSAULT,
+    SLASHER_BREAKTHROUGH,
     SLASHER_ACCEL,
     MAX
 }

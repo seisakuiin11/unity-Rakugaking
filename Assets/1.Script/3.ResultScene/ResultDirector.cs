@@ -9,9 +9,6 @@ public class ResultDirector : MonoBehaviour
     [SerializeField] Animator transitionAnim;
     [SerializeField,Tooltip("ミリ秒")] int TransitionAnimTime;
 
-    [SerializeField, Header("キャライラストデータ")]
-    CharaVisualData[] charaVisuals;
-
     bool waitFlag;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -44,7 +41,7 @@ public class ResultDirector : MonoBehaviour
         // 勝者のプレイヤー番号とキャラIDを取得
         ProjectManager.Instance.GetWinner(out var playerIndex, out var charaNum);
 
-        winnerImg.sprite = charaVisuals[charaNum].KeyVisual;
+        winnerImg.sprite = CharaDataManager.Instance.GetVisualData(charaNum).KeyVisual;
         playerAnim.SetInteger("Player", playerIndex);
 
         // キャラID取得
@@ -68,6 +65,7 @@ public class ResultDirector : MonoBehaviour
         // トランジション再生 画面表示
         transitionAnim.gameObject.SetActive(true);
         transitionAnim.SetTrigger("Hide");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
     }
 
     // 次のシーンへ
@@ -76,6 +74,7 @@ public class ResultDirector : MonoBehaviour
         waitFlag = true;
 
         transitionAnim.SetTrigger("Show");
+        SoundManager.Instance.SEPlay(SE.MEKURU);
 
         await Task.Delay(TransitionAnimTime);
 

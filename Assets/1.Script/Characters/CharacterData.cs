@@ -1,4 +1,5 @@
 
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 [CreateAssetMenu(menuName = "Data/CharacterData")]
@@ -13,12 +14,14 @@ public class CharacterData : ScriptableObject
 
 
 
-    public RuntimeAnimatorController animation;
+    
     
     public  AttackData leftAttackFrameData;
     public  AttackData rightAttackFrameData;
     public  AttackData upAttackFrameData;
     public  AttackData downAttackFrameData;
+
+
 }
 
 

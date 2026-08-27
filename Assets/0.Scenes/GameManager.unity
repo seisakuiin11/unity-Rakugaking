@@ -119,6 +119,65 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &409214316
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 409214318}
+  - component: {fileID: 409214317}
+  m_Layer: 0
+  m_Name: CharaDataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &409214317
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409214316}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c48cf7449c8c64643b004a7d5763b96a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  characterProfiles:
+  - {fileID: 11400000, guid: fa129812a28cbb7478665a6a872c787d, type: 2}
+  - {fileID: 11400000, guid: dab2d70491de1cf4ab2f19eb78b9b815, type: 2}
+  - {fileID: 11400000, guid: c724909e1a7807245b48512481dcc5dd, type: 2}
+  - {fileID: 11400000, guid: 4259d2768a77d1b4a8d57fe8e3e4f214, type: 2}
+  charaVisualDatas:
+  - {fileID: 11400000, guid: c19e8b7412622014abcc6cd5c60f5bfa, type: 2}
+  - {fileID: 11400000, guid: 5f183033a946c364f89d325868767a17, type: 2}
+  - {fileID: 11400000, guid: 10e764697243fcf44adc1823eaee16bd, type: 2}
+  - {fileID: 11400000, guid: fe8de5a982ea18147bfb97be9b019b00, type: 2}
+  characterPrefabs:
+  - {fileID: 9132147412365986167, guid: 988bd96b3a5ffe44fb8a80f682287711, type: 3}
+  - {fileID: 9132147412365986167, guid: baefd92f5550fd746b9433a8cd6955ec, type: 3}
+  - {fileID: 9132147412365986167, guid: ee45e9da9b1d83b4a8cadd651ff8a7d7, type: 3}
+  - {fileID: 9132147412365986167, guid: ee45e9da9b1d83b4a8cadd651ff8a7d7, type: 3}
+--- !u!4 &409214318
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409214316}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &548702251
 GameObject:
   m_ObjectHideFlags: 0
@@ -546,9 +605,9 @@ MonoBehaviour:
   SEPlayer: {fileID: 653207290}
   bgmLoadFlag: 1
   seLoadFlag: 1
-  charaseLoadFlag: 0
-  narboLoadFlag: 0
-  slasherLoadFlag: 0
+  charaseLoadFlag: 1
+  narboLoadFlag: 1
+  slasherLoadFlag: 1
   boyLoadFlag: 0
   zeraLoadFlag: 0
 --- !u!4 &1060987556
@@ -845,7 +904,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   NextScene: 0
   charaIDs: 0000000000000000ffffffffffffffff
-  playerTypes: 01000000020000000000000000000000
+  playerTypes: 01020000
   winnerIndex: 1
   soundManager: {fileID: 1060987555}
   backImg: {fileID: 1465920114}
@@ -1014,3 +1073,4 @@ SceneRoots:
   - {fileID: 1347078619}
   - {fileID: 947451764}
   - {fileID: 1060987556}
+  - {fileID: 409214318}

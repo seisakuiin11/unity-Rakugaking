@@ -7,7 +7,7 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/0.Scenes/GameManager.unity
-    guid: a320657bf30a4f04cbf710bc29e4a5e9
+    guid: 7f94648c4e279dd47a929a2345e76d4b
   - enabled: 1
     path: Assets/0.Scenes/TitleScene.unity
     guid: a25c461a9dee4414e8360fdc95deac84
@@ -15,14 +15,17 @@ EditorBuildSettings:
     path: Assets/0.Scenes/SelectScene.unity
     guid: 25bc8fcb05ecd664eba727a4d082b34e
   - enabled: 1
-    path: Assets/0.Scenes/GameScene.unity
-    guid: a18fadc6c020b704fbefd6c973d93c1f
-  - enabled: 1
     path: Assets/0.Scenes/JoinScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
+    path: Assets/0.Scenes/GameScene.unity
+    guid: a18fadc6c020b704fbefd6c973d93c1f
+  - enabled: 1
     path: Assets/0.Scenes/TrainingScene.unity
     guid: 8b43745d3214561429c9bdfed7067a24
+  - enabled: 1
+    path: Assets/0.Scenes/TutorialScene.unity
+    guid: 5e0a0a581a2b941468e0fe6e6d95e743
   - enabled: 1
     path: Assets/0.Scenes/TestScene.unity
     guid: bf9981a55c8f97d459bb7d846633d1a7

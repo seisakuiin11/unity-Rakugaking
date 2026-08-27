@@ -12,18 +12,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3721889ef50856e439a89d27353d1865, type: 3}
   m_Name: KeriageData
   m_EditorClassIdentifier: 
-  AtkDamage: 0
-  AtkHitStanFrame: 0
+  AtkDamage: 400
+  AtkHitStanFrame: 10
   KnockBackData:
-    KnockBackFlip: 0
+  - KnockBackFlip: 2
     Vector: 0
-    KnockBackVec: {x: 0, y: 0}
-    KnockBackPower: 0
-  AllFrame: 40
+    KnockBackVec: {x: 0.5, y: 0.5}
+    KnockBackPower: 20
+  AllFrame: 20
   data:
   - TargetFrame: 0
+    KnockBackNum: 0
     colliders: []
-  - TargetFrame: 40
+  - TargetFrame: 2
+    KnockBackNum: 0
+    colliders:
+    - radius: 2
+      localPos: {x: 1, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 0
+    - radius: 1
+      localPos: {x: 0, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 1
+  - TargetFrame: 10
+    KnockBackNum: 0
+    colliders: []
+  - TargetFrame: 20
+    KnockBackNum: 0
     colliders: []
   palameters: []
   prefabs: []

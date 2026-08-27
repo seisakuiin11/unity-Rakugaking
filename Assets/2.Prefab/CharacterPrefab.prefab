@@ -170,7 +170,7 @@ MonoBehaviour:
   shieldBreakStanFlame: 300
   shieldDamageMultiply: 0.1
   shieldBreakKnockBack: {x: 0, y: 30}
-  colManager: {fileID: 0}
+  state: 0
 --- !u!50 &4042453791925665867
 Rigidbody2D:
   serializedVersion: 5
@@ -421,7 +421,7 @@ Animator:
   m_GameObject: {fileID: 8333249273702766673}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: f657d34eb4108ed479180dcd65af8f16, type: 2}
+  m_Controller: {fileID: 9100000, guid: 5daa51e4cf1270f4db3428c714e262bc, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

@@ -12,18 +12,59 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3721889ef50856e439a89d27353d1865, type: 3}
   m_Name: Somersault-BreakthroughData
   m_EditorClassIdentifier: 
-  AtkDamage: 0
-  AtkHitStanFrame: 0
+  AtkDamage: 400
+  AtkHitStanFrame: 35
   KnockBackData:
-    KnockBackFlip: 0
+  - KnockBackFlip: 0
     Vector: 0
-    KnockBackVec: {x: 0, y: 0}
-    KnockBackPower: 0
-  AllFrame: 130
+    KnockBackVec: {x: 0, y: 1}
+    KnockBackPower: 20
+  - KnockBackFlip: 0
+    Vector: 0
+    KnockBackVec: {x: 0, y: 1}
+    KnockBackPower: 4
+  - KnockBackFlip: 2
+    Vector: 0
+    KnockBackVec: {x: 0.3, y: -0.7}
+    KnockBackPower: 20
+  AllFrame: 65
   data:
   - TargetFrame: 0
+    KnockBackNum: 0
     colliders: []
-  - TargetFrame: 130
+  - TargetFrame: 2
+    KnockBackNum: 0
+    colliders:
+    - radius: 1.5
+      localPos: {x: 1, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 0
+  - TargetFrame: 12
+    KnockBackNum: 0
+    colliders: []
+  - TargetFrame: 31
+    KnockBackNum: 1
+    colliders:
+    - radius: 1
+      localPos: {x: 1, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 0
+  - TargetFrame: 40
+    KnockBackNum: 1
+    colliders:
+    - radius: 1
+      localPos: {x: 1, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 0
+  - TargetFrame: 55
+    KnockBackNum: 2
+    colliders:
+    - radius: 1
+      localPos: {x: 1, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 0
+  - TargetFrame: 65
+    KnockBackNum: 0
     colliders: []
   palameters:
   - name: "\u30B5\u30DE\u30FC\u30BD\u30EB\u30C8\u7D42\u4E86\u30D5\u30EC\u30FC\u30E0"

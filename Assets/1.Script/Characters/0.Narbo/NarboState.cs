@@ -18,7 +18,7 @@ public class NarboLeftAttackState : AttackState
     {
        base.StateStart();
         anim.SetTrigger("AttackLeft");
-    
+        SoundManager.Instance.CharaSEPlay(CHARASE.NARBO_WASHOI);
     }
 
    
@@ -39,9 +39,10 @@ public class NarboDownAttackState:AttackState
 
 
     public override void StateStart()
-    {
+    {   
         base.StateStart();
         anim.SetTrigger("AttackDown");
+        SoundManager.Instance.CharaSEPlay(CHARASE.NARBO_ZINARASI);
     }
 
 }
@@ -66,7 +67,7 @@ public class NarboRightAttackState : AttackState
     {
         base.StateStart();
         anim.SetTrigger("AttackRight");
-
+        SoundManager.Instance.CharaSEPlay(CHARASE.NARBO_STRIKE);
         //初期の方向をキャラの向きに合わせる
         moveDirX = chara.transform.localScale.x;
     }
@@ -175,7 +176,7 @@ public class NarboUpAttackState : AttackState
             anim.SetTrigger("Daibakuhatu");
             atkFlag = true;
             ColliderAction();
-
+            SoundManager.Instance.CharaSEPlay(CHARASE.NARBO_DAIBAKUHATU);
             //次のターゲットフレームに変更
             targetFrameIndex++;
         }

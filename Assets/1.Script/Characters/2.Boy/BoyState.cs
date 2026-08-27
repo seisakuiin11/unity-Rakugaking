@@ -30,10 +30,16 @@ public class BoyLeftAttackState : AttackState
 /// </summary>
 public class BoyDownAttackState : AttackState
 {
+
+
+
+
+    
     public override void StateInit(CharacterController _chara, Animator _anim)
     {
         base.StateInit(_chara, _anim);
         atkData = chara.charaData.leftAttackFrameData;
+        
     }
 
 
@@ -44,6 +50,10 @@ public class BoyDownAttackState : AttackState
 
     }
 
+    private void StatusUp()
+    {
+       
+    }
 
 }
 
@@ -54,6 +64,8 @@ public class BoyDownAttackState : AttackState
 /// </summary>
 public class BoyRightAttackState : AttackState
 {
+
+
     public override void StateInit(CharacterController _chara, Animator _anim)
     {
         base.StateInit(_chara, _anim);
@@ -79,7 +91,7 @@ public class BoyRightAttackState : AttackState
 public class BoyUpAttackState : AttackState
 {
 
-    public event Action OnBoyUpAttack;
+    public event Action OnBoyStatusUp;
     public override void StateInit(CharacterController _chara, Animator _anim)
     {
         base.StateInit(_chara, _anim);
@@ -91,8 +103,13 @@ public class BoyUpAttackState : AttackState
     {
         base.StateStart();
         anim.SetTrigger("AttackUp");
-
+        OnBoyStatusUp.Invoke();
+        
     }
 
-
+    public void BoyStatusUp() 
+    {
+        OnBoyStatusUp?.Invoke();
+    
+    }
 }

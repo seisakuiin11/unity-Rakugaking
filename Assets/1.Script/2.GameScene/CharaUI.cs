@@ -20,9 +20,9 @@ public class CharaUI : MonoBehaviour
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Init(Sprite _img, int maxValue)
+    public void Init(int charaID, int maxValue)
     {
-        image.sprite = _img;
+        image.sprite = CharaDataManager.Instance.GetVisualData(charaID).BustUp;
         hpBar.maxValue = maxValue;
         hpBar.value = maxValue;
 

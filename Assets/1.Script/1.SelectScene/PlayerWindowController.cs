@@ -7,19 +7,24 @@ using UnityEngine.UI;
 public class PlayerWindowController : MonoBehaviour
 {
     [SerializeField, Header("ウィンドウ")] Image window;
-    [SerializeField, Header("テキストエリア")] Image textWindow;
-    [SerializeField, Header("テキスト 名前")] TextMeshProUGUI nameText;
-    [SerializeField, Header("テキスト 技")] TextMeshProUGUI[] skillNameText;
-    [SerializeField, Header("キャラImage")] Image charaImg;
+    [Header("選択中のテキスト群")]
+    [SerializeField] GameObject textSelectArea;
+    [SerializeField] TextMeshProUGUI nameText_Select;
+    [SerializeField] TextMeshProUGUI[] skillNameText_Select;
+    [SerializeField] TextMeshProUGUI[] skillExplanationText_Select;
+    [Header("決定後のテキスト群+キャラImage")]
+    [SerializeField] GameObject textAcceptArea;
+    [SerializeField] TextMeshProUGUI nameText_Accept;
+    [SerializeField] TextMeshProUGUI[] skillNameText_Accept;
+    [SerializeField] Image charaImg;
+
     [SerializeField, Header("アクセスプレイヤーアイコン")] Animator[] accessPlayerIcons;
     [SerializeField, Header("決定アイコン")] GameObject acceptImg;
+
     [Header("素材")]
     [SerializeField] Sprite noneWindow;
-    [SerializeField] Sprite noneTextWindow;
     [SerializeField] Sprite playerWindow;
-    [SerializeField] Sprite playerTextWindow;
     [SerializeField] Sprite cpuWindow;
-    [SerializeField] Sprite cpuTextWindow;
 
     CharaIconsController charaSelecter;
 
@@ -54,7 +59,12 @@ public class PlayerWindowController : MonoBehaviour
         if (accessPlayer >= 0 && accessPlayer != _playerNum) return;
 
         // キャラ選択中
-        if (accessPlayer >= 0) { charaImg.sprite = charaSelecter.Process(index, inputData); return; }
+        if (accessPlayer >= 0)
+        {
+            int id = charaSelecter.Process(index, inputData);
+            SetDataSelect(id);
+            return;
+        }
 
         // キャラの再選択 or CPUの追加
         if(inputData.ACCEPT)
@@ -80,11 +90,10 @@ public class PlayerWindowController : MonoBehaviour
         playerType = PlayerType.NONE;
         accessPlayer = -1;
 
+        // ウィンドウを変えて非表示
         window.sprite = noneWindow;
-        textWindow.sprite = noneTextWindow;
-        nameText.text = "";
-        foreach (var t in skillNameText) t.text = "";
-        charaImg.gameObject.SetActive(false);
+        textSelectArea.SetActive(false);
+        textAcceptArea.SetActive(false);
         acceptImg.SetActive(false);
     }
 
@@ -104,20 +113,21 @@ public class PlayerWindowController : MonoBehaviour
         if(_player == PlayerType.PLAYER)
         {
             window.sprite = playerWindow;
-            textWindow.sprite= playerTextWindow;
         }
         else // CPUなら、CPUの枠に
         {
             window.sprite= cpuWindow;
-            textWindow.sprite= cpuTextWindow;
         }
 
         SetActiveAccessPlayerIcon(_accessPlayer, true, true);
-        charaImg.gameObject.SetActive(true);
         acceptImg.SetActive(false);
 
+        charaSelecter.SelectCharacter(_player, index, charaID);
+
         // キャライラストの取得
-        charaImg.sprite = charaSelecter.SelectCharacter(_player, index, charaID);
+        textAcceptArea.SetActive(false);
+        textSelectArea.SetActive(true);
+        SetDataSelect(charaID);
 
         SoundManager.Instance.SEPlay(SE.PLAYER_ENTRY);
     }
@@ -133,11 +143,55 @@ public class PlayerWindowController : MonoBehaviour
         accessPlayer = -1;
         charaID = id;
 
+        charaSelecter.SelectCharacter(playerType, index, id);
+
         // キャライラストの取得
-        charaImg.sprite = charaSelecter.SelectCharacter(playerType, index, id);
+        textSelectArea.SetActive(false);
+        textAcceptArea.SetActive(true);
+        SetDataAccept(id);
 
         // 確定アイコン表示
         acceptImg.SetActive(true);
+    }
+
+    // テキストデータを設定する
+    void SetDataSelect(int id)
+    {
+        var profile = CharaDataManager.Instance.GetCharacterProfile(id);
+
+        if (profile == null) return;
+
+        // 名前
+        nameText_Select.text = profile.CharaName;
+        // スキル名
+        skillNameText_Select[0].text = profile.SkillNames[CharacterProfile.ATTACK_UP];
+        skillNameText_Select[1].text = profile.SkillNames[CharacterProfile.ATTACK_RIGHT];
+        skillNameText_Select[2].text = profile.SkillNames[CharacterProfile.ATTACK_LEFT];
+        skillNameText_Select[3].text = profile.SkillNames[CharacterProfile.ATTACK_DOWN];
+        // スキル説明
+        skillExplanationText_Select[0].text = profile.SkillExplanation[CharacterProfile.ATTACK_UP];
+        skillExplanationText_Select[1].text = profile.SkillExplanation[CharacterProfile.ATTACK_RIGHT];
+        skillExplanationText_Select[2].text = profile.SkillExplanation[CharacterProfile.ATTACK_LEFT];
+        skillExplanationText_Select[3].text = profile.SkillExplanation[CharacterProfile.ATTACK_DOWN];
+    }
+
+    void SetDataAccept(int id)
+    {
+        var visu = CharaDataManager.Instance.GetVisualData(id);
+        charaImg.sprite = visu.BustUp;
+
+        var profile = CharaDataManager.Instance.GetCharacterProfile(id);
+
+        if (profile == null) return;
+
+        // 名前
+        nameText_Accept.text = profile.CharaName;
+        // スキル名
+        skillNameText_Accept[0].text = profile.SkillNames[CharacterProfile.ATTACK_UP];
+        skillNameText_Accept[1].text = profile.SkillNames[CharacterProfile.ATTACK_RIGHT];
+        skillNameText_Accept[2].text = profile.SkillNames[CharacterProfile.ATTACK_LEFT];
+        skillNameText_Accept[3].text = profile.SkillNames[CharacterProfile.ATTACK_DOWN];
+
     }
 
     /// <summary>

@@ -35,6 +35,11 @@ public class ControllerInputManager : MonoBehaviour
         Init();
     }
 
+    private void OnDestroy()
+    {
+        InputSystem.onDeviceChange -= OnDeviceChange;
+    }
+
     /// <summary>
     /// 初期化
     /// </summary>
@@ -117,6 +122,7 @@ public class ControllerInputManager : MonoBehaviour
             if (controllers[i] != null) continue; // すでに入ってるよ
 
             controllers[i] = cont;
+            Debug.Log("JoinPlayer：" + i);
             break;
         }
 

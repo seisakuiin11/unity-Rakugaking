@@ -14,7 +14,7 @@ public class AttackData : ScriptableObject
     public int AtkHitStanFrame;
 
     [Tooltip("ノックバック情報")]
-    public KnockBackData KnockBackData;
+    public List<KnockBackData> KnockBackData;
 
     [Tooltip("攻撃の全体フレーム")]
     public int AllFrame;
@@ -42,6 +42,7 @@ public struct OriginalParameter
 public struct FrameData
 {
     public int TargetFrame;
+    public int KnockBackNum;
     public List<CircleColData> colliders;
 }
 
