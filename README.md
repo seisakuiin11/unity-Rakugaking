@@ -1,7 +1,10 @@
 # らくがきんぐ
-
+最大4人で遊べる対戦ゲーム。<br>
+落書きをモチーフに、個性あるキャラクターたちが繰り広げるハチャメチャバトル。<br>
+&nbsp;
 !["タイトル"](./RepositoryImages/TitleImage.png)
 
+## 開発ポイント
 !["スライド1"](./RepositoryImages/ProjectManager.png)
 !["スライド2"](./RepositoryImages/SoundManager.png)
 !["スライド3"](./RepositoryImages/ScriptSoundLoad.png)
