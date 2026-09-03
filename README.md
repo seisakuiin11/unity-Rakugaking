@@ -8,8 +8,7 @@
 !["スライド1"](./RepositoryImages/ProjectManager_編集済.png)
 !["スライド2"](./RepositoryImages/SoundManager_編集済.png)
 !["スライド3"](./RepositoryImages/CharaDataManager_編集済.png)
-!["スライド4"](./RepositoryImages/CharaProfile.png)
-!["スライド5"](./RepositoryImages/CharaVisualData.png)
+!["スライド4"](./RepositoryImages/CharaData.png)
 
 ## 使用技術
 - Unity 6000.0.64f1
