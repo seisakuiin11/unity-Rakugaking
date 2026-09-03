@@ -5,13 +5,11 @@
 !["タイトル"](./RepositoryImages/TitleImage.png)
 
 ## 開発ポイント
-!["スライド1"](./RepositoryImages/ProjectManager.png)
-!["スライド2"](./RepositoryImages/SoundManager.png)
-!["スライド3"](./RepositoryImages/ScriptSoundLoad.png)
-!["スライド4"](./RepositoryImages/CharaDataManager.png)
-!["スライド5"](./RepositoryImages/カスタムエディタ.png)
-!["スライド6"](./RepositoryImages/CharaProfile.png)
-!["スライド7"](./RepositoryImages/CharaVisualData.png)
+!["スライド1"](./RepositoryImages/ProjectManager_編集済.png)
+!["スライド2"](./RepositoryImages/SoundManager_編集済.png)
+!["スライド3"](./RepositoryImages/CharaDataManager_編集済.png)
+!["スライド4"](./RepositoryImages/CharaProfile.png)
+!["スライド5"](./RepositoryImages/CharaVisualData.png)
 
 ## 使用技術
 - Unity 6000.0.64f1
