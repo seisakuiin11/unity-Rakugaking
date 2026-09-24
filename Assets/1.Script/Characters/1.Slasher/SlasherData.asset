@@ -14,14 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHp: 8500
   maxShield: 300
-  moveSpeed: 600
-  jumpForce: 20
+  moveSpeed: 750
+  jumpForce: 22
   shieldBreakKnockBack:
     KnockBackFlip: 0
     Vector: 0
     KnockBackVec: {x: 0, y: 1}
     KnockBackPower: 30
-  animation: {fileID: 0}
   leftAttackFrameData: {fileID: 11400000, guid: fc2abd0ba118a0f4c9245a2c9604f7b4, type: 2}
   rightAttackFrameData: {fileID: 11400000, guid: f036799e39a0d7648b7aa2e9898d2165, type: 2}
   upAttackFrameData: {fileID: 11400000, guid: a5f4c3f863c0a5a4c8ca146b60dfe20e, type: 2}

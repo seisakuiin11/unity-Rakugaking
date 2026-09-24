@@ -12,17 +12,18 @@ public class SlasherLeftAttackState: AttackState
     private float gravityScale;
 
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.leftAttackFrameData;
+        gravityScale = chara.GetRigidBody().gravityScale;
     }
 
     public override void StateStart()
     {
         base.StateStart();
         anim.SetTrigger("AttackLeft");
-        chara.JumpAction();
+        charaCommon.JumpAction();
         SoundManager.Instance.CharaSEPlay(CHARASE.SLASHER_SOMERSAULT);
         breakthroughFlag = false;
         breakthroughfirstFlag = false;
@@ -31,9 +32,9 @@ public class SlasherLeftAttackState: AttackState
     public override void StateUpdateMethod(InputCommandData _inputData)
     {
         //横滑り防止
-        if (chara.GroundCheck())
+        if (charaCommon.GroundCheck())
         {
-            chara.StopXMove();
+            charaCommon.StopXMove();
         }
         if (atkData == null) chara.ChangeState(CHARA_STATE.idle);
         inputData = _inputData;
@@ -68,7 +69,6 @@ public class SlasherLeftAttackState: AttackState
             breakthroughfirstFlag=true;
 
             // 重力を消し、空中にとどまる
-            gravityScale = chara.GetRigidBody().gravityScale;
             chara.GetRigidBody().gravityScale = 0f;
             chara.GetRigidBody().linearVelocity = Vector2.zero;
            
@@ -105,6 +105,14 @@ public class SlasherLeftAttackState: AttackState
 
     }
 
+    public override void StateEnd()
+    {
+        base.StateEnd();
+
+        // 重力を戻す
+        chara.GetRigidBody().gravityScale = gravityScale;
+    }
+
     private bool ButtonTapCheck()
     {
         if (inputData.ATTACK_LEFT && !inputData.ATTACK_LEFT_OLD)
@@ -128,10 +136,9 @@ public class SlasherLeftAttackState: AttackState
 /// </summary>
 public class SlasherDownAttackState : AttackState
 {
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-       
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.downAttackFrameData;
     }
 
@@ -155,9 +162,9 @@ public class SlasherRightAttackState : AttackState
 {
     private float moveDirX;         //進行方向
     private float moveSpeed = 1.5f;   //攻撃中の移動速度
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.rightAttackFrameData;
 
 
@@ -183,7 +190,7 @@ public class SlasherRightAttackState : AttackState
 
         Vector2 moveVec = new(moveDirX * moveSpeed, 0);
 
-        chara.MoveAction(moveVec);
+        charaCommon.MoveAction(moveVec);
         AttackAction();
     }
 
@@ -201,9 +208,9 @@ public class SlasherUpAttackState : AttackState
     private bool continueAtkFlag; //百裂を継続するかのフラグ
 
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.upAttackFrameData;
     }
 
@@ -319,8 +326,8 @@ public class SlasherUpAttackState : AttackState
         //当たり判定の更新、生成
         if (_hitBoxColList != null)
         {
-            chara.HitBoxReset();
-            chara.UpdateHitBoxColliderData(_hitBoxColList);
+            charaCommon.HitBoxReset();
+            charaCommon.UpdateHitBoxColliderData(_hitBoxColList);
         }
 
     }
@@ -339,7 +346,7 @@ public class SlasherUpAttackState : AttackState
         if (chara.DirectionRightCheck()) moveVec.x = -0.1f;
         else moveVec.x = 0.1f;
 
-        chara.Move(moveVec);
+        charaCommon.Move(moveVec);
     }
 
     private bool RapidTapCheck()

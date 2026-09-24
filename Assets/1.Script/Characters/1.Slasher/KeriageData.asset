@@ -23,7 +23,11 @@ MonoBehaviour:
   data:
   - TargetFrame: 0
     KnockBackNum: 0
-    colliders: []
+    colliders:
+    - radius: 1
+      localPos: {x: 0, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 1
   - TargetFrame: 2
     KnockBackNum: 0
     colliders:
@@ -37,9 +41,17 @@ MonoBehaviour:
       colType: 1
   - TargetFrame: 10
     KnockBackNum: 0
-    colliders: []
+    colliders:
+    - radius: 1
+      localPos: {x: 0, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 1
   - TargetFrame: 20
     KnockBackNum: 0
-    colliders: []
+    colliders:
+    - radius: 1
+      localPos: {x: 0, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 1
   palameters: []
   prefabs: []

@@ -1,3 +1,4 @@
+using SelectScene;
 using System;
 using TMPro;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class PlayerWindowController : MonoBehaviour
     [SerializeField, Header("ウィンドウ")] Image window;
     [Header("選択中のテキスト群")]
     [SerializeField] GameObject textSelectArea;
+    [SerializeField] Image charaImg_Select;
     [SerializeField] TextMeshProUGUI nameText_Select;
     [SerializeField] TextMeshProUGUI[] skillNameText_Select;
     [SerializeField] TextMeshProUGUI[] skillExplanationText_Select;
@@ -33,8 +35,8 @@ public class PlayerWindowController : MonoBehaviour
 
     int index;
     PlayerType playerType;
-    int playerNum;
     int charaID;
+    int playerNum = -1;
     int accessPlayer = -1;
 
     public void Init(CharaIconsController _charaSelecter, int _index, Action<int,int> action)
@@ -55,6 +57,9 @@ public class PlayerWindowController : MonoBehaviour
     /// <param name="_playerNum">誰が操作しているか</param>
     public void Process(SelectScene.InputData inputData, int _playerNum)
     {
+        // 所有者がいる場合、所有者にしか操作できない
+        if (playerNum >= 0 && playerNum != _playerNum) return;
+
         // アクセスしているプレイヤーと同一人物ではない
         if (accessPlayer >= 0 && accessPlayer != _playerNum) return;
 
@@ -89,6 +94,7 @@ public class PlayerWindowController : MonoBehaviour
     {
         playerType = PlayerType.NONE;
         accessPlayer = -1;
+        playerNum = -1;
 
         // ウィンドウを変えて非表示
         window.sprite = noneWindow;
@@ -104,6 +110,14 @@ public class PlayerWindowController : MonoBehaviour
     /// <param name="_accessPlayer">アクセスしているプレイヤー番号</param>
     public void JoinPlayer(PlayerType _player, int _accessPlayer)
     {
+        // アクセスしている人がいたら、一度リセット
+        if(accessPlayer >= 0)
+        {
+            charaSelecter.Accept(index);
+            SetActiveAccessPlayerIcon(accessPlayer, true, false);
+            PlayerNone();
+        }
+
         playerType = _player;
         accessPlayer = _accessPlayer;
         // 有人ならプレイヤー番号を 無人なら-1を
@@ -138,12 +152,11 @@ public class PlayerWindowController : MonoBehaviour
     public void Accept(int id)
     {
         SetActiveAccessPlayerIcon(accessPlayer, true, false);
+        charaSelecter.SelectCharacter(playerType, index, id);
 
         // アクセスを解除
         accessPlayer = -1;
         charaID = id;
-
-        charaSelecter.SelectCharacter(playerType, index, id);
 
         // キャライラストの取得
         textSelectArea.SetActive(false);
@@ -157,6 +170,9 @@ public class PlayerWindowController : MonoBehaviour
     // テキストデータを設定する
     void SetDataSelect(int id)
     {
+        var visu = CharaDataManager.Instance.GetVisualData(id);
+        charaImg_Select.sprite = visu.BustUp;
+
         var profile = CharaDataManager.Instance.GetCharacterProfile(id);
 
         if (profile == null) return;

@@ -110,9 +110,9 @@ public enum SE
 public enum CHARASE
 {   // 共通SE ---------------------------
     JUMP,
-    HIT_1, HIT_2, HIT_3,
-    GUARD_1, GUARD_2, GUARD_CRASH,
-    PIYOPIYO,
+    HIT_1, HIT_2, //HIT_3,
+    GUARD_1, /*GUARD_2,*/ GUARD_CRASH,
+    //PIYOPIYO,
     NARBO_ZINARASI, // ナルボ -----------
     NARBO_STRIKE,
     NARBO_WASHOI,
@@ -122,6 +122,16 @@ public enum CHARASE
     SLASHER_SOMERSAULT,
     SLASHER_BREAKTHROUGH,
     SLASHER_ACCEL,
+    BOY_KENHURU, // ボーイ -------------
+    BOY_KENNAGERU,
+    BOY_KENMODOSU,
+    BOY_GENKIIPPAI,
+    ZERA_IGAIGA, // ゼーラ -------------
+    ZERA_TOGETOGE_CHARGE,
+    ZERA_TOGETOGE_PUNCH,
+    ZERA_KATIKATI,
+    ZERA_KATIKATI_2,
+    ZERA_TIKUTIKU,
     MAX
 }
 
@@ -306,6 +316,24 @@ public class SoundManager : MonoBehaviour
     {
         int i = Random.Range(0, bgmNames.Length);
         BGMPlay(bgmNames[i]);
+    }
+    /// <summary>
+    /// BGMのランダム再生
+    /// </summary>
+    /// <param name="charaIDs"></param>
+    public void RandomBGMPlay(int[] charaIDs)
+    {
+        List<BGM> list = new List<BGM>();
+
+        foreach (var id in charaIDs)
+        {
+            if(id < 0) continue;
+
+            BGM charaBGM = BGM.NARBO + (byte)id;
+            list.Add(charaBGM);
+        }
+
+        RandomBGMPlay(list.ToArray());
     }
 
     /// <summary>

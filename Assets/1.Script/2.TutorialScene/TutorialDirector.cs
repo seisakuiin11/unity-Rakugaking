@@ -113,14 +113,16 @@ public class TutorialDirector : MonoBehaviour
         hideTransition.gameObject.SetActive(true);
 
         // キャラクター生成
-        int[] charaIDs = new int[MaxPlayer] { 0, 1 };
+        int[] charaIDs = new int[MaxPlayer] { 0, -1 };
         PlayerType[] playerTypes = new PlayerType[MaxPlayer] { PlayerType.PLAYER, PlayerType.CPU };
         ProjectManager.Instance.SetCharaIDs(charaIDs, playerTypes);
-        characters = charCreater.CreateCharacters(MaxPlayer); // プレイヤーとCPU(的)
+        characters = charCreater.CreateCharacters(playerTypes, charaIDs, MaxPlayer); // プレイヤーとCPU(的)
 
         //　各キャラクターの初期化処理
         for (int i = 0; i < characters.Length; i++)
         {
+            if (characters[i] == null) continue;
+
             characters[i].Init(i, colManager);
             characters[i].OnDead += OnRevive; // 死んだら復活する処理を格納
         }
@@ -128,7 +130,7 @@ public class TutorialDirector : MonoBehaviour
         characters[CPU].OnDamage += OnDamage;
 
         // UI管理者の初期化処理
-        gameUIController.Init(characters);
+        gameUIController.Init(characters, MaxPlayer);
         tutorialText.text = "";
 
         // トランジション

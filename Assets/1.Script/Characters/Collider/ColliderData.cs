@@ -19,8 +19,11 @@ public struct CircleColData:Collider
     /// </summary>
     public Vector3 worldPos { get {
 
-            if (trans == null) Debug.Log("transないよ");
-
+            if (trans == null)
+            {
+                Debug.Log("transないよ");
+                return Vector3.zero;
+            }
             var pos= trans.position + localPos;
             pos.x= trans.position.x + localPos.x* trans.localScale.x;
             return pos; } }
@@ -30,6 +33,11 @@ public struct CircleColData:Collider
 
     public Vector3 LocalPos { get
         {
+            if (trans == null)
+            {
+                Debug.Log("transないよ");
+                return Vector3.zero;
+            }
             var pos = localPos;
             pos.x = localPos.x * trans.localScale.x;
             return pos;

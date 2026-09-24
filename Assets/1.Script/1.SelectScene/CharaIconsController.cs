@@ -78,7 +78,7 @@ public class CharaIconsController : MonoBehaviour
         }
 
         // 決定なら
-        if (inputData.ACCEPT) { Debug.Log("決定"); OnAccepted?.Invoke(controllerIndex, framesPosNum[controllerIndex]); }
+        if (inputData.ACCEPT) { OnAccepted?.Invoke(controllerIndex, framesPosNum[controllerIndex]); }
 
         // ポジション移動
         FrameMove(controllerIndex, num);

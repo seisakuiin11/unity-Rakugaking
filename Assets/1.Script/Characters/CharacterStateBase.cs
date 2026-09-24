@@ -18,6 +18,8 @@ public class CharacterStateBase
     /// </summary>
     protected CharacterController chara;
 
+
+    protected CharacterCommon charaCommon;
     /// <summary>
     /// コントローラーの入力
     /// </summary>
@@ -36,9 +38,10 @@ public class CharacterStateBase
     /// 初期化　　　base:CharacterControllerとAnimatorを格納する
     /// </summary>
     /// <param name="_chara"></param>
-    public virtual void StateInit(CharacterController _chara,Animator _anim)
+    public virtual void StateInit(CharacterController _chara,CharacterCommon _charaCommon,Animator _anim)
     {
         chara = _chara;
+        charaCommon = _charaCommon;
         anim = _anim;
     }
 
@@ -68,10 +71,14 @@ public class CharacterStateBase
     /// <param name="_knockBack"></param>
     public virtual void Damage(int _damage,int _stanFrame,KnockBackData _knockBack,Collider _col)
     {
-        chara.ChangeState(CHARA_STATE.stan);
-        chara.HPChange(-_damage);
-        chara.SetStanFlame(_stanFrame);
-        chara.KnockBack(_knockBack, _col);
+        if(_stanFrame  != 0)
+        {
+            chara.ChangeState(CHARA_STATE.stan);
+            charaCommon.SetStanFlame(_stanFrame);
+        }
+
+        charaCommon.HPChange(-_damage);
+        charaCommon.KnockBack(_knockBack, _col);
         SoundManager.Instance.CharaSEPlay(CHARASE.HIT_1);
     }
 
@@ -94,9 +101,9 @@ public class IdleState : CharacterStateBase
 
 
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara,CharacterCommon _charaCommon,Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon,_anim);
 
 
 
@@ -121,12 +128,12 @@ public class IdleState : CharacterStateBase
 
         if (chara.JumpCheck()) { chara.ChangeState(CHARA_STATE.jump); return; }
 
-        if (!chara.GroundCheck()) { chara.ChangeState(CHARA_STATE.air); return; }
+        if (!charaCommon.GroundCheck()) { chara.ChangeState(CHARA_STATE.air); return; }
 
-        if(_inputData.DIRECTION_DATA==DIRECTIONDATA.DOWN && chara.FootingGroundCheck(out var col))  { chara.FootingGroundOff(col);}
+        if(_inputData.DIRECTION_DATA==DIRECTIONDATA.DOWN && charaCommon.FootingGroundCheck(out var col))  { charaCommon.FootingGroundOff(col);}
 
-        chara.StopXMove();
-        chara.ShieldHeal();
+        charaCommon.StopXMove();
+        charaCommon.ShieldHeal();
     }
 
     public override void StateEnd()
@@ -144,11 +151,10 @@ public class MoveState : CharacterStateBase
 {
 
 
-  
-    public override void StateInit(CharacterController _chara, Animator _anim)
+
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
-        
+        base.StateInit(_chara, _charaCommon, _anim);
     }
 
 
@@ -161,7 +167,7 @@ public class MoveState : CharacterStateBase
     public override void StateUpdateMethod(InputCommandData _inputData)
     {
         inputData = _inputData;
-        chara.FixedMoveAction(inputData.DIRECTION_VEC2);
+        charaCommon.FixedMoveAction(inputData.DIRECTION_VEC2);
 
         if (chara.ShieldCheck()){ chara.ChangeState(CHARA_STATE.shield); return; }
 
@@ -169,13 +175,13 @@ public class MoveState : CharacterStateBase
 
         if (chara.JumpCheck()) { chara.ChangeState(CHARA_STATE.jump);  return; }
         
-        if (!chara.GroundCheck()){ chara.ChangeState(CHARA_STATE.air); return; }
+        if (!charaCommon.GroundCheck()){ chara.ChangeState(CHARA_STATE.air); return; }
 
         if (!chara.MoveCheck()) { chara.ChangeState(CHARA_STATE.idle); return; }
 
-        if (_inputData.DIRECTION_DATA == DIRECTIONDATA.DOWN && chara.FootingGroundCheck(out var col)) { chara.FootingGroundOff(col); }
+        if (_inputData.DIRECTION_DATA == DIRECTIONDATA.DOWN && charaCommon.FootingGroundCheck(out var col)) { charaCommon.FootingGroundOff(col); }
 
-        chara.ShieldHeal();
+        charaCommon.ShieldHeal();
    
         
     }
@@ -197,17 +203,16 @@ public class JumpState : CharacterStateBase
 {
     public event Action<CharacterController> OnJump;
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
-
+        base.StateInit(_chara, _charaCommon, _anim);
     }
 
 
     public override void StateStart()
     {
         anim.SetTrigger("Jump");
-        chara.JumpAction();
+        charaCommon.JumpAction();
         chara.ChangeState(CHARA_STATE.air);
         SoundManager.Instance.CharaSEPlay(CHARASE.JUMP);
         OnJump?.Invoke(chara);
@@ -216,7 +221,7 @@ public class JumpState : CharacterStateBase
 
     public override void StateUpdateMethod(InputCommandData _inputData)
     {
-        if (chara.GroundCheck()) chara.ChangeState(CHARA_STATE.idle);
+        if (charaCommon.GroundCheck()) chara.ChangeState(CHARA_STATE.idle);
 
         inputData = _inputData;
 
@@ -224,7 +229,7 @@ public class JumpState : CharacterStateBase
 
        
 
-        if(inputData.DIRECTION_VEC2.x!=0) chara.MoveAction(inputData.DIRECTION_VEC2);
+        if(inputData.DIRECTION_VEC2.x!=0) charaCommon.MoveAction(inputData.DIRECTION_VEC2);
 
     }
 
@@ -239,10 +244,9 @@ public class AirState : CharacterStateBase
 {
 
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
-
+        base.StateInit(_chara, _charaCommon, _anim);
     }
 
 
@@ -257,13 +261,13 @@ public class AirState : CharacterStateBase
     {
         base.StateUpdateMethod(_inputData);
 
-        if (chara.GroundCheck()) chara.ChangeState(CHARA_STATE.idle);
+        if (charaCommon.GroundCheck()) chara.ChangeState(CHARA_STATE.idle);
         
         if (chara.AttackCheck()) return;
 
-        if (chara.MoveCheck()) chara.FixedMoveAction(inputData.DIRECTION_VEC2);
+        if (chara.MoveCheck()) charaCommon.FixedMoveAction(inputData.DIRECTION_VEC2);
        
-        chara.ShieldHeal();
+        charaCommon.ShieldHeal();
     }
 
     public override void StateEnd()
@@ -285,12 +289,10 @@ public class StanState : CharacterStateBase
 {
 
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
-
+        base.StateInit(_chara, _charaCommon, _anim);
     }
-
 
     public override void StateStart()
     {
@@ -300,8 +302,8 @@ public class StanState : CharacterStateBase
 
     public override void StateUpdateMethod(InputCommandData _inputData)
     {
-        chara.stanFrame--;
-        if (chara.stanFrame<=0) chara.ChangeState(CHARA_STATE.idle);
+        charaCommon.stanFrame--;
+        if (charaCommon.stanFrame<=0) chara.ChangeState(CHARA_STATE.idle);
         
 
     }
@@ -321,10 +323,11 @@ public class StanState : CharacterStateBase
 public class ShieldState:CharacterStateBase
 {
     GameObject shieldObject;
+   
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         shieldObject = chara.GetShieldObject();
     }
 
@@ -333,6 +336,7 @@ public class ShieldState:CharacterStateBase
     {
         anim.SetTrigger("Shield");
         shieldObject.SetActive(true);
+        Debug.Log(shieldObject);
     }
 
 
@@ -342,20 +346,20 @@ public class ShieldState:CharacterStateBase
         if(!chara.ShieldCheck())chara.ChangeState(CHARA_STATE.idle);
 
         //横滑り防止
-        if (chara.GroundCheck()) chara.StopXMove();
+        if (charaCommon.GroundCheck()) charaCommon.StopXMove();
 
-        chara.shieldValue--;
+        charaCommon.ShieldDamage();
 
-        if (chara.shieldValue <= 0) { ShieldBreak(); return; }
+        if (charaCommon.currentShield <= 0) { ShieldBreak(); return; }
 
-        //シールド処理
+        //シールド描画処理
         ShieldObjectProcess();
 
     }
 
     private void ShieldObjectProcess()
     {
-        float shieldRatio = chara.GetShieldRatio();
+        float shieldRatio = charaCommon.GetShieldRatio();
    
         shieldObject.transform.localScale = new(shieldRatio,shieldRatio);
     }
@@ -364,17 +368,18 @@ public class ShieldState:CharacterStateBase
     private void ShieldBreak()
     {
         SoundManager.Instance.CharaSEPlay(CHARASE.GUARD_CRASH);
-        chara.SetStanFlame(chara.shieldBreakStanFlame);
-        chara.KnockBack(chara.shieldBreakKnockBack);
+        charaCommon.SetStanFlame(charaCommon.shieldBreakStanFlame);
+        charaCommon.KnockBack(charaCommon.shieldBreakKnockBack);
+        charaCommon.ShieldMaxHeal();
         chara.ChangeState(CHARA_STATE.stan);
         
+
     }
 
     public override void Damage(int _damage, int _stanFrame, KnockBackData _knockBackData,Collider _col)
     {
-        chara.shieldValue -= (int)(_damage * chara.shieldDamageMultiply);
-
-        if (chara.shieldValue <= 0) {
+        charaCommon.ShieldDamage((int)(_damage * charaCommon.shieldDamageMultiply));
+        if (charaCommon.currentShield <= 0) {
             ShieldBreak(); 
             return; }
 
@@ -386,6 +391,7 @@ public class ShieldState:CharacterStateBase
         anim.SetBool("Air", false);
         shieldObject.SetActive(false);
         base.StateEnd();
+        Debug.Log("Shield_Close");
 
     }
 }
@@ -408,12 +414,12 @@ public class AttackState : CharacterStateBase
 
     protected AttackData atkData;
     protected ColliderManager colManager;
- 
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
-        colManager=chara.colManager;
+        base.StateInit(_chara, _charaCommon, _anim);
+        colManager=charaCommon.colManager;
     }
 
 
@@ -437,7 +443,7 @@ public class AttackState : CharacterStateBase
         atkAllFrame = atkData.AllFrame;
 
         //hitboxをリセット
-        chara.HitBoxReset();
+        charaCommon.HitBoxReset();
 
     }
 
@@ -447,7 +453,7 @@ public class AttackState : CharacterStateBase
         
      
         //横滑り防止
-        if (chara.GroundCheck()) chara.StopXMove();
+        if (charaCommon.GroundCheck()) charaCommon.StopXMove();
 
         //攻撃フレーム処理
         AttackAction();
@@ -505,15 +511,15 @@ public class AttackState : CharacterStateBase
         {
             var colData = colDatas[i];
             //Transformを格納
-            colData.trans = chara.gameObject.transform;
+            colData.trans = charaCommon.gameObject.transform;
 
             
 
 
-            var scaleY =chara.gameObject.transform.localScale.y;
+            var scaleY =charaCommon.gameObject.transform.lossyScale.y;
 
             //サイズを対象のTransform.LocalScaleのY軸に合わせる
-            colData.radius *= chara.gameObject.transform.localScale.y;
+            colData.radius *= charaCommon.gameObject.transform.lossyScale.y;
 
             //位置関係を対象のTransform.LocalScaleのY軸に合わせる
             colData.localPos = new Vector3(
@@ -540,8 +546,8 @@ public class AttackState : CharacterStateBase
         //当たり判定の更新、生成
         if (_hitBoxColList != null)
         {
-            chara.HitBoxReset();
-            chara.UpdateHitBoxColliderData(_hitBoxColList);
+            charaCommon.HitBoxReset();
+            charaCommon.UpdateHitBoxColliderData(_hitBoxColList);
         }
 
     }
@@ -554,7 +560,7 @@ public class AttackState : CharacterStateBase
     {
 
         //地上にいるならidle、空中にいるならairに戻す
-        if (chara.GroundCheck()) chara.ChangeState(CHARA_STATE.idle);
+        if (charaCommon.GroundCheck()) chara.ChangeState(CHARA_STATE.idle);
         else chara.ChangeState(CHARA_STATE.air);
     }
 
@@ -563,7 +569,7 @@ public class AttackState : CharacterStateBase
     /// 攻撃hit時の処理
     /// </summary>
     /// <param name="chara">当たった相手</param>
-    /// <param name="pos">当たったコライダーのworldPos</param>
+    /// <param name="col">当たったコライダーのworldPos</param>
     protected virtual void AtkHit(CharacterController chara,Collider col)
     {
        
@@ -581,7 +587,7 @@ public class AttackState : CharacterStateBase
 
         if (atkData == null) return;
         DestroyCollider();
-        chara.HitBoxDefaultSet();
+        charaCommon.HitBoxDefaultSet();
     }
 
 
@@ -591,7 +597,7 @@ public class AttackState : CharacterStateBase
     protected void DestroyCollider()
     {
         colManager.DestroyCircleCol(atkColList);
-        chara.HitBoxReset();
+        charaCommon.HitBoxReset();
 
     }
     

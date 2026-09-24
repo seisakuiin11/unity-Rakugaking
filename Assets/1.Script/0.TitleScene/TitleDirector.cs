@@ -88,6 +88,8 @@ public class TitleDirector : MonoBehaviour
         // enum変換
         if(!Enum.TryParse<SceneName>(sceneName, out var scene)) { Debug.LogError("SceneNameが違います"); return; }
 
+        // ボタン選択の強制解除
+        eventSystem.SetSelectedGameObject(null);
         // アニメーション再生
         hideTransition.gameObject.SetActive(true);
         hideTransition.SetTrigger("Show");

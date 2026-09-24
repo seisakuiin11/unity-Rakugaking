@@ -32,6 +32,13 @@ MonoBehaviour:
       localPos: {x: 0, y: 0, z: 0}
       trans: {fileID: 0}
       colType: 1
+  - TargetFrame: 45
+    KnockBackNum: 0
+    colliders:
+    - radius: 2
+      localPos: {x: 0, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 1
   - TargetFrame: 75
     KnockBackNum: 0
     colliders: []

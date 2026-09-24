@@ -21,84 +21,64 @@ public enum CHARA_STATE
 
 }
 
-public enum ATTACK_STATE
-{
-    none=0,
-    left,
-    right,
-    up, 
-    down,
-}
+
 
 
 
 /// <summary>
-/// キャラクター自身
+/// キャラクター全体の制御
 /// </summary>
 public class CharacterController : MonoBehaviour
 {
-    [SerializeField] protected Rigidbody2D rb;
-    [SerializeField] protected Animator anim;
-    [SerializeField] public CharacterData charaData;
-    [SerializeField] protected CapsuleCollider2D capsuleCol;
-    [SerializeField] CharaTransition transitionAnim;
-    [SerializeField] GameObject shieldObject;
+    [SerializeField] private Animator anim;             //アニメーション
+    [SerializeField] public CharacterData charaData;    //キャラクターのステータス
 
-    public CharacterStateBase nowState;
+    [SerializeField] CharaTransition transitionAnim;    //トランジションアニメーション
+    [SerializeField] GameObject shieldObject;           //キャラクターのシールドオブジェクト
+　  private CharacterCommon charaCommon;                //キャラクターの共通処理スクリプト
+    private CharacterBehavior charaBehavior;            //キャラクターの固有処理スクリプト
 
+    private Rigidbody2D rb;                             //RigidBody
+    
     Dictionary<CHARA_STATE, CharacterStateBase> stateDictionary;
     private (Func<bool> condition, Action action)[] _attackTable;
 
+    public CharacterStateBase nowState;                 //現在のステート
+    [SerializeField] private CHARA_STATE state;         //現在のステート（デバッグの確認用）
+    private CHARA_STATE saveAtkState;
+
     private int playerNum;                       //プレイヤーの番号
 
-    [SerializeField] private int hp;              //キャラクターの体力
-    private int maxHp;                            //キャラクターの最大体力
 
-    private float speed;                         //速度
-    public float gravity;
-
-
-    private float jumpForce;                     //ジャンプの高さ
     private float jumpStickThreshold = 0.45f;    //ジャンプと判定するスティックの傾き具合
-    private float sideMoveDeadZone = 0.25f;      //横移動のデッドゾーン
 
 
     private bool isDead;                         //死んでいるかどうか
     public int stanFrame;                       //スタンする時間
 
 
-    private int maxShield;                              //シールドの最大値
-    public int shieldValue;                            //シールドの耐久値
-    public int shieldBreakStanFlame = 300;               //シールドブレイクによるスタンフレーム数
-    public float shieldDamageMultiply = 0.1f;             //hpダメージ → シールドダメージへの変換倍率
-    public Vector2 shieldBreakKnockBack = new(0, 30);    //シールドブレイクによるノックバックベクトル
 
+ 
 
-
-    InputCommandData inputData;
+    private InputCommandData inputData;             //  プレイヤーの入力情報
 
     private Action damageAction = null;
 
 
 
-    [SerializeField] private CHARA_STATE state;
 
 
 
-    //当たり判定関係
-    private HitBoxColliderList hitboxColList;     //現在このプレイヤーについている当たり判定
-    private PushBox_Circle pushBox;        //現在このプレイヤーについている押し出しコライダー
+    public event Action<int,int> OnDamage;                   //ダメージ時のイベント
 
-    public event Action<int,int> OnDamage;
-
-    public event Action<int, CharacterController> OnDead;
+    public event Action<int, CharacterController> OnDead;    //死亡時のイベント
 
 
     [NonSerialized]public ColliderManager colManager;
 
     
 
-    private Dictionary<CHARA_STATE, Action> animDictionary;
+  
 
 
     /// <summary>
@@ -112,32 +92,21 @@ public class CharacterController : MonoBehaviour
         //コライダーマネージャーを取得
         colManager= _colManager;
 
-        //キャラクターの情報を挿入
-        speed = charaData.moveSpeed;
-        maxHp = charaData.maxHp;
-        hp = maxHp;
-        jumpForce = charaData.jumpForce;
-        maxShield = charaData.maxShield;
-        shieldValue = maxShield;
 
-        //当たり判定をデフォルトに設定
-        HitBoxDefaultSet();
-
-        //押し出しコライダーの初期設定
-        CircleColData _pushBox = new();
-        _pushBox.localPos = Vector3.zero;
-        _pushBox.radius = 0.5f;
-        _pushBox.trans = gameObject.transform;
-
-        //押し出しコライダーを生成
-        pushBox = colManager.UpdatePushBoxColliderData(_pushBox, this);
 
 
 
         List<CircleColData> hitboxList = new();
 
-        //攻撃ステート情報スクリプトを取得
-        CharacterAttackStateList atkState=GetComponent<CharacterAttackStateList>();
+        rb=GetComponent<Rigidbody2D>();
+
+        //CharacterCommonの初期化
+        charaCommon = GetComponent<CharacterCommon>();
+        charaCommon.Init(this, rb, charaData, _colManager);
+
+        //キャラ固有スクリプトを取得
+        charaBehavior =GetComponent<CharacterBehavior>();
+        charaBehavior.Init(colManager);
 
         //各ステートの情報を挿入
         stateDictionary = new Dictionary<CHARA_STATE, CharacterStateBase>()
@@ -148,30 +117,31 @@ public class CharacterController : MonoBehaviour
             {CHARA_STATE.air,      new AirState()     },
             {CHARA_STATE.stan,     new StanState()    },
             {CHARA_STATE.shield,   new ShieldState()  },
-            {CHARA_STATE.atkLeft,  atkState.GetLeftAtkState },
-            {CHARA_STATE.atkRight, atkState.GetRightAtkState},
-            {CHARA_STATE.atkUp,    atkState.GetUpAtkState   },
-            {CHARA_STATE.atkDown,  atkState.GetDownAtkState },
+            {CHARA_STATE.atkLeft,  charaBehavior.Atk_Left },
+            {CHARA_STATE.atkRight, charaBehavior.Atk_Right},
+            {CHARA_STATE.atkUp,    charaBehavior.Atk_Up   },
+            {CHARA_STATE.atkDown,  charaBehavior.Atk_Down },
             
         };
-
 
         //各ステートに初回情報を挿入
         foreach (var state in stateDictionary)
         {
-            state.Value.StateInit(this, anim);
+            state.Value.StateInit(this,charaCommon ,anim);
         }
 
 
 
         _attackTable = new (Func<bool> condition, Action action)[]
         {
-            (()=>inputData.ATTACK_LEFT,()=>ChangeState(CHARA_STATE.atkLeft)),
-            (()=>inputData.ATTACK_RIGHT,()=>ChangeState(CHARA_STATE.atkRight)),
-            (()=>inputData.ATTACK_UP,()=>ChangeState(CHARA_STATE.atkUp)),
-            (()=>inputData.ATTACK_DOWN,()=>ChangeState(CHARA_STATE.atkDown)),
+            (()=>inputData.ATTACK_LEFT,()=>ChangeAtkState(CHARA_STATE.atkLeft)),
+            (()=>inputData.ATTACK_RIGHT,()=>ChangeAtkState(CHARA_STATE.atkRight)),
+            (()=>inputData.ATTACK_UP,()=>ChangeAtkState(CHARA_STATE.atkUp)),
+            (()=>inputData.ATTACK_DOWN,()=>ChangeAtkState(CHARA_STATE.atkDown)),
 
         };
+
+
 
         nowState = stateDictionary[CHARA_STATE.idle];
         nowState.StateStart();
@@ -197,8 +167,11 @@ public class CharacterController : MonoBehaviour
     {
         if (isDead) return;
 
+        //現在のStateのupdate処理を行う
         nowState.StateUpdateMethod(inputData);
-
+        
+        //キャラ固有のupdate処理を行う
+        charaBehavior.UpdateMethod();
 
 
         //ダメージアクションが格納されていた場合、Updateの最後に処理(相打ち処理のため)
@@ -227,160 +200,20 @@ public class CharacterController : MonoBehaviour
         nowState.StateStart();
     }
 
+
     /// <summary>
-    /// キャラクターのState変更(攻撃State)
+    /// キャラクターのState変更(攻撃時)
     /// </summary>
     /// <param name="state"></param>
-    public void ChangeState(ATTACK_STATE _state)
+    public void ChangeAtkState(CHARA_STATE _state)
     {
+        //長押しによる連射防止
+        if (saveAtkState == _state) return;
         nowState.StateEnd();
-        nowState = stateDictionary[CHARA_STATE.attack];
-        state = CHARA_STATE.attack;
+        nowState = stateDictionary[_state];
+        state = _state;
+        saveAtkState = state;
         nowState.StateStart();
-    }
-
-
-    /// <summary>
-    /// 移動速度が固定化された移動処理（Animation関係なし、動くだけ）
-    /// </summary>
-    /// <param name="value"></param>
-    public void FixedMoveAction(Vector2 value)
-    {
-        
-        var v = rb.linearVelocity;
-
-        //入力がデッドゾーン以下なら移動しない
-        if (Mathf.Abs(value.x) <= sideMoveDeadZone) return;
-
-
-        // 入力から方向を調べ、進行方向にする
-        var direction = value.x >= 0 ? 1 : -1;
-
-        v.x = direction *speed * Time.deltaTime;
-
-        rb.linearVelocity = v;
-
-
-        if (value.x != 0) DirectionChange(value.x);
-    }
-
-    /// <summary>
-    /// 移動速度が固定化されていない移動処理（Animation関係なし、動くだけ）
-    /// </summary>
-    /// <param name="value"></param>
-    public void MoveAction(Vector2 value)
-    {
-
-        var v = rb.linearVelocity;
-
-
-        //入力がデッドゾーン以下なら移動しない
-        if (Mathf.Abs(value.x) <= sideMoveDeadZone) return;
-
-        v.x = value.x * speed * Time.deltaTime;
-
-        rb.linearVelocity = v;
-
-        if (value.x != 0) DirectionChange(value.x);
-
-    }
-
-    /// <summary>
-    /// プレイヤーの向きを変更する
-    /// </summary>
-    /// <param name="xValue">x方向の値</param>
-    private void DirectionChange(float xValue)
-    {
-
-
-        // 入力から方向を調べ、進行方向にする
-        var direction = xValue >= 0 ? 1 : -1;
-
-        //進行方向からプレイヤーの向きを変更
-        transform.localScale = new Vector3(direction, 1, 1);
-    }
-
-    public void Move(Vector2 value)
-    {
-        transform.position = new Vector3(transform.position.x+value.x, transform.position.y+value.y);
-    }
-
-
-    /// <summary>
-    /// 足場に足がついているか確認する
-    /// </summary>
-    /// <returns></returns>
-    public bool FootingGroundCheck(out Collider2D col)
-    {
-
-        CapsuleCollider2D pCol = GetComponent<CapsuleCollider2D>();
-
-
-        var pColHeightHalf = pCol.size.y / 2;
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * (pColHeightHalf + 0.01f), Vector2.down, 0.1f);
-
-        col = null;
-
-        //rayを飛ばし何もなかったら抜ける
-        if (hit.collider == null) return false ;
-
-        if (hit.collider.tag != "Footing") return false;
-
-
-        col = hit.collider;
-
-        return true;
-        
-
-
-
-    }
-
-    /// <summary>
-    /// 足場を降りる
-    /// </summary>
-    /// <param name="footingCol"></param>
-    public void FootingGroundOff(Collider2D footingCol)
-    {
-
-        CapsuleCollider2D pCol = GetComponent<CapsuleCollider2D>();
-
-        StartCoroutine(FootingGroundOFF(pCol,footingCol));
-    }
-
-    private IEnumerator FootingGroundOFF(Collider2D iCol,Collider2D footingCol)
-    {
-        Physics2D.IgnoreCollision(iCol, footingCol, true);
-        yield return new WaitForSeconds(0.5f);
-        Physics2D.IgnoreCollision(iCol, footingCol, false);
-    }
-
-
-    /// <summary>
-    /// プレイヤーのサイズ変更
-    /// </summary>
-    /// <param name="scale"></param>
-    public void ScaleChange(Vector3 scale)
-    {
-        //現在の向いている方向にx軸を合わせる
-        if (transform.localScale.x < 0) scale.x *= -1f;
-        transform.localScale=scale;
-    }
-
-
-
-
-
-
-    /// <summary>
-    /// その場で止まる
-    /// </summary>
-    public void StopXMove()
-    {
-      var v = rb.linearVelocity;
-        v.x = 0;
-        rb.linearVelocity = v;
     }
 
 
@@ -390,7 +223,7 @@ public class CharacterController : MonoBehaviour
     /// <param name="_damage">ダメージ</param>
     /// <param name="_stanFrame">操作不可能時間</param>
     /// <param name="_knockBackData">ノックバック情報</param>
-    /// <param name="_colPos">衝突したコライダーのWorldPos</param>
+    /// <param name="_col">衝突したコライダー</param>
     public void Damage(int _damage, int _stanFrame, KnockBackData _knockBackData,Collider _col)
     {
 
@@ -406,135 +239,7 @@ public class CharacterController : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// HPの値をvalue分増やし反映させる
-    /// </summary>
-    /// <param name="value"></param>
-    public void HPChange(int value)
-    {
-        hp += value;
-        
-        //最大以上にはならないように
-        if(hp>=maxHp)hp=maxHp;
-
-        //UIを反映
-        OnDamage?.Invoke(playerNum, hp);
-
-        //０以下なら死亡
-        if (hp <= 0) Dead();
-    }
-
-
-
-
-   /// <summary>
-   /// 吹っ飛ぶ
-   /// </summary>
-   /// <param name="_data">ノックバックの情報</param>
-   /// <param name="pos"></param>
-    public void KnockBack(KnockBackData _data,Collider _col)
-    { 
-
- 
-
-        //---------吹っ飛び方が指定ベクトルの場合
-
-        if (_data.Vector == VectorType.Const)
-        {
-            ConstKnockBack(_data.KnockBackFlip, _data.KnockBackVec, _data.KnockBackPower, _col);
-            return;
-        }
-
-
-
-        //----------------------放射状に飛ぶ場合
-        if (_data.Vector == VectorType.Radial)
-        {
-            RadialKnockBack(_data.KnockBackFlip, _data.KnockBackPower, _col);
-            return;
-        }
-
- 
-    }
-
-
-    /// <summary>
-    /// 指定した方向に吹っ飛ぶ
-    /// </summary>
-    private void ConstKnockBack(KnockBackFlipMode _mode,Vector2 _knockBackVec ,float _knockBackPower, Collider _col)
-    {
-        //吹っ飛ぶ方向を決める（右側か左側か）
-
-        float flipVec = 0;
-
-        //基準がない場合はベクトルの正規方向に飛ぶ
-        if (_mode == KnockBackFlipMode.None) flipVec = 1;
-        //基準がコライダーの場合
-        else if (_mode == KnockBackFlipMode.Collider) { flipVec = transform.position.x - _col.WorldPos.x >= 0 ? 1 : -1; }
-        //基準が持ち主の場合
-        else if (_mode == KnockBackFlipMode.Character)
-        {
-            var x = _col.WorldPos.x - _col.LocalPos.x;
-            flipVec = transform.position.x - x >= 0 ? 1 : -1;
-        }
-
-
-
-        //反転を加味して吹っ飛ばす
-        var vector = _knockBackVec;
-        vector.x *= flipVec;
-
-        
-
-        rb.linearVelocity = vector * _knockBackPower;
-
-
-
-    }
-
-    /// <summary>
-    /// 放射状に飛ぶ
-    /// </summary>
-    private void RadialKnockBack(KnockBackFlipMode _mode,float _knockBackPower,Collider _col)
-    {
-
-        if (_mode== KnockBackFlipMode.Collider)
-        {
-            var v = (transform.position - _col.WorldPos).normalized;
-            rb.linearVelocity = v * _knockBackPower;
-            return;
-        }
-        else if (_mode == KnockBackFlipMode.Character)
-        {
-            //Characterならそのコライダーの持ち主の中心点を基準に左右の判定をする
-            var x = _col.WorldPos - _col.LocalPos;
-            var v = (transform.position - x).normalized;
-            rb.linearVelocity = v * _knockBackPower;
-            return;
-        }
-
-
-    }
-
-
-    /// <summary>
-    /// Vector2の方向に吹っ飛ぶ
-    /// </summary>
-    /// <param name="vec"></param>
-    public void KnockBack(Vector2 vec)
-    {
- 
-        rb.linearVelocity = vec; 
-    }
-
-    /// <summary>
-    /// スタンするフレーム数をセットする
-    /// </summary>
-    /// <param name="value"></param>
-    public void SetStanFlame(int value)
-    {
-        stanFrame=value;
-    }
+    
 
 
     /// <summary>
@@ -544,30 +249,23 @@ public class CharacterController : MonoBehaviour
     {
         isDead = false;
         gameObject.SetActive(true);
-
-        hp = maxHp;
-        HitBoxDefaultSet();
-
-        CircleColData _pushBox = new();
-        _pushBox.localPos = Vector3.zero;
-        _pushBox.radius = 0.5f;
-        _pushBox.trans = gameObject.transform;
-
-        List<CircleColData> hitboxList = new();
-        pushBox = colManager.UpdatePushBoxColliderData(_pushBox, this);
+        charaCommon.Revive();
     }
 
-
+    public void HPUIChange(int _hp)
+    {
+        //UIを反映
+        OnDamage?.Invoke(playerNum, _hp);
+    }
 
     /// <summary>
     /// 死亡
     /// </summary>
-    private void Dead()
+    public void Dead()
     {
         DeadAnim();
 
-        HitBoxReset();
-        PushBoxReset();
+
 
         isDead = true;
         nowState.StateEnd();
@@ -582,91 +280,14 @@ public class CharacterController : MonoBehaviour
     }
 
 
-    /// <summary>
-    /// ジャンプ処理（Animation関係なし、動くだけ）
-    /// </summary>
-    public void JumpAction()
+    
+    public void GameEnd()
     {
-        var v = rb.linearVelocity;
-        v.y = jumpForce;
-        rb.linearVelocity = v;
-
+        charaCommon.StopXMove();
     }
+    
 
 
-    /// <summary>
-    /// シールド回復処理
-    /// </summary>
-    public void ShieldHeal()
-    {
-        if (shieldValue >= maxShield) return;
-        shieldValue++;
-        
-    }
-
-    /// <summary>
-    /// 自身の生成しているHitBoxをすべて削除する
-    /// </summary>
-    public void HitBoxReset()
-    {
-        colManager.DestroyCircleCol(hitboxColList);
-        hitboxColList = null;
-    }
-
-    /// <summary>
-    /// 自身の生成しているPushBoxを削除する
-    /// </summary>
-    public void PushBoxReset()
-    {
-        colManager.DestroyCircleCol(pushBox);
-        pushBox = null;
-    }
-
-    /// <summary>
-    /// 当たり判定を通常時の場所に生成する
-    /// </summary>
-    public void HitBoxDefaultSet()
-    {
-        CircleColData hitbox = new();
-        hitbox.localPos = Vector3.zero;
-        hitbox.radius = 1f;
-        hitbox.trans = gameObject.transform;
-
-        List<CircleColData> hitboxList = new();
-        hitboxList.Add(hitbox);
-        hitboxColList = colManager.UpdateHitBoxColliderData(hitboxList, this);
-
-
-
-    }
-
-
-    /// <summary>
-    /// HitBoxを生成する
-    /// </summary>
-    /// <param name="colDatas"></param>
-    public void UpdateHitBoxColliderData(List<CircleColData>colDatas)
-    {
-       hitboxColList = colManager.UpdateHitBoxColliderData(colDatas, this);
-    }
-
-
-
-    public int GetHP() => hp;
-    public bool GetIsDead() => isDead;
-
-    public CHARA_STATE State() => state;
-    public Rigidbody2D GetRigidBody()=> rb;
-
-    public GameObject GetShieldObject() => shieldObject;
-
-    public int GetPNum() => playerNum;
-
-    /// <summary>
-    /// 現在のシールド割合を取得する
-    /// </summary>
-    /// <returns></returns>
-    public float GetShieldRatio() =>(float)shieldValue / (float)maxShield;
 
     /// <summary>
     /// キャラクターのトランジションアニメーション　登場,退出
@@ -679,10 +300,18 @@ public class CharacterController : MonoBehaviour
 
 
     //-----------------------------------------------------------------------------------------------状態取得
+    public bool GetIsDead() => isDead;
 
+    public CHARA_STATE State() => state;
+    public Rigidbody2D GetRigidBody() => rb;
 
+    public GameObject GetShieldObject() => shieldObject;
 
+    public int GetPNum() => playerNum;
 
+    public int GetHP() =>charaCommon.GetHP();
+
+    public CharacterCommon GetCharacterCommon => charaCommon;
 
     /// <summary>
     /// 横入力しているか確認する
@@ -714,34 +343,6 @@ public class CharacterController : MonoBehaviour
 
 
 
-    /// <summary>
-    /// 足場に足がついているか確認する
-    /// </summary>
-    /// <returns></returns>
-    public bool GroundCheck()
-    {
-        CapsuleCollider2D pCol = GetComponent<CapsuleCollider2D>();
-        //var pColHeightHalf = transform.localScale.y/2;
-
-        //RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * (pColHeightHalf + 0.01f), Vector2.down, 0.1f);
-
-        var pColHeightHalf = pCol.size.y/ 2;
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * (pColHeightHalf + 0.01f), Vector2.down, 0.1f);
-
-    
-
-        //rayを飛ばし何もなかったら抜ける
-        if (hit.collider == null) return false;
-
-        if (hit.collider.tag == "Player") return false;
-        //Debug.Log(hit.collider, gameObject);
-        
-        return true;
-
-
-
-    }
 
 
 
@@ -751,7 +352,7 @@ public class CharacterController : MonoBehaviour
     /// <summary>
     /// 攻撃入力をしているか確認し、していたらStateをそれぞれのAttackにする
     /// </summary>
-    /// <returns></returns>
+    /// <returns>攻撃を入力しているか</returns>
     public bool AttackCheck()
     {
         foreach (var value in _attackTable)
@@ -761,6 +362,9 @@ public class CharacterController : MonoBehaviour
             value.action();
             return true;
         }
+
+        //入力していない場合saveAtkを初期化（長押し連打防止）
+        saveAtkState = CHARA_STATE.idle;
         return false;
     }
 

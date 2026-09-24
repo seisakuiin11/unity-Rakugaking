@@ -8,12 +8,13 @@ using UnityEngine.UI;
 public class CharaUI : MonoBehaviour
 {
     [SerializeField] Image image;
+    [SerializeField] Image hpBarImage;
     [SerializeField] Slider hpBar;
     [Header("HPバー ダメージアニメーション設定")]
     [SerializeField] float AnimDurationTime = 0.3f;
     [SerializeField] float AnimStrength = 30f;
     [SerializeField] int AnimCount = 20;
-
+    [SerializeField] float hpBarRedChangePercent=0.2f;
     Vector3 defaultPos;
 
 
@@ -27,6 +28,8 @@ public class CharaUI : MonoBehaviour
         hpBar.value = maxValue;
 
         defaultPos = hpBar.transform.position;
+
+        hpBarImage.color = Color.green;
     }
 
     public void ChangeHPValue(int value)
@@ -42,6 +45,16 @@ public class CharaUI : MonoBehaviour
             hpBar.transform.position = defaultPos;
 
             hpBar.transform.DOShakePosition(AnimDurationTime, AnimStrength, AnimCount);
+        }
+
+        // hpが一定割合以下の場合色を変える
+        if (value / hpBar.maxValue <= hpBarRedChangePercent)
+        {
+            hpBarImage.color= Color.red;
+        }
+        else
+        {
+            hpBarImage.color= Color.green;
         }
     }
 }

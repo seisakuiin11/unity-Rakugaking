@@ -99,7 +99,7 @@ Animator:
   m_GameObject: {fileID: 2113249059864555516}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 72697ca7445d56d459054f1de8705a2c, type: 2}
+  m_Controller: {fileID: 9100000, guid: 8d924d4bb939ef842b6d5a91ad0fe058, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -121,9 +121,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2711137206906122298}
   - component: {fileID: 9132147412365986167}
+  - component: {fileID: 2921950389074967410}
   - component: {fileID: 4042453791925665867}
   - component: {fileID: 769594930785852654}
-  - component: {fileID: -8793933326656381430}
+  - component: {fileID: 1980599821468343354}
   m_Layer: 6
   m_Name: Slasher
   m_TagString: Player
@@ -162,20 +163,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 538b6755bdbde8942bd67620305c142f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 4042453791925665867}
   anim: {fileID: 6306042249439022385}
   charaData: {fileID: 11400000, guid: 56fa9ef688ed4dd458227e662ee4ef36, type: 2}
-  capsuleCol: {fileID: 769594930785852654}
   transitionAnim: {fileID: 2295357075246011110}
   shieldObject: {fileID: 8322095347160979244}
-  hp: 0
-  gravity: 1
-  stanFrame: 0
-  shieldValue: 0
-  shieldBreakStanFlame: 300
-  shieldDamageMultiply: 0.1
-  shieldBreakKnockBack: {x: 0, y: 30}
   state: 0
+  stanFrame: 0
+--- !u!114 &2921950389074967410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973439399624765838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb38bfb367760a2479e5684912c99f25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  capsuleCol: {fileID: 769594930785852654}
+  shieldObject: {fileID: 8322095347160979244}
+  stanFrame: 120
+  shieldBreakKnockBack: {x: 0, y: 30}
 --- !u!50 &4042453791925665867
 Rigidbody2D:
   serializedVersion: 5
@@ -240,7 +249,7 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0}
   m_Size: {x: 2, y: 4}
   m_Direction: 0
---- !u!114 &-8793933326656381430
+--- !u!114 &1980599821468343354
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -249,7 +258,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3973439399624765838}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19ff77d776db59143bdba1a87f63ffaa, type: 3}
+  m_Script: {fileID: 11500000, guid: 24adb71c847b64a4681215bac4bbfd6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6791740610579806310

@@ -6,9 +6,9 @@ using UnityEngine;
 /// </summary>
 public class IncompleteLeftAttackState : AttackState
 {
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.leftAttackFrameData;
     }
 
@@ -21,21 +21,14 @@ public class IncompleteLeftAttackState : AttackState
 
 
 
-
-
-
-
-
-
 /// <summary>
 /// 蹴り上げ
 /// </summary>
 public class IncompleteDownAttackState : AttackState
 {
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-       
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.downAttackFrameData;
     }
 
@@ -54,9 +47,9 @@ public class IncompleteDownAttackState : AttackState
 /// </summary>
 public class IncompleteRightAttackState : AttackState
 {
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.rightAttackFrameData;
 
 
@@ -78,9 +71,9 @@ public class IncompleteRightAttackState : AttackState
 /// </summary>
 public class IncompleteUpAttackState : AttackState
 {
-    public override void StateInit(CharacterController _chara, Animator _anim)
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.upAttackFrameData;
     }
 

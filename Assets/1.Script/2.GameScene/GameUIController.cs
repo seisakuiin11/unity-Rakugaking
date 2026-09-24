@@ -31,7 +31,7 @@ public class GameUIController : MonoBehaviour
     /// <summary>
     /// 初期化
     /// </summary>
-    public void Init(CharacterController[] _characters)
+    public void Init(CharacterController[] _characters, int maxPlayer)
     {
         // 一度非表示
         if (charaUIs != null)
@@ -40,14 +40,18 @@ public class GameUIController : MonoBehaviour
             foreach (var pn in playerNumbers) pn.SetActive(false);
 
         // キャラアイコン 生成
-        var harfWidth = (_characters.Length - 1) * charaUIDisSpace * 0.5f;
+        int count = 0;
+        var harfWidth = (maxPlayer - 1) * charaUIDisSpace * 0.5f;
         var charaIDs = ProjectManager.Instance.GetCharaIDs();
         for(int i = 0; i < _characters.Length; i++)
         {
+            if (_characters[i] == null) continue;
+
             charaUIs[i].gameObject.SetActive(true);
-            charaUIs[i].transform.Translate(i * charaUIDisSpace - harfWidth, 0, 0);  // ポジション設定
+            charaUIs[i].transform.Translate(count * charaUIDisSpace - harfWidth, 0, 0);  // ポジション設定
             charaUIs[i].Init(charaIDs[i], _characters[i].GetHP());
             _characters[i].OnDamage += ChangeHP;
+            count++;
         }
 
         pauseUI.SetActive(false);
@@ -62,16 +66,20 @@ public class GameUIController : MonoBehaviour
     /// <param name="_characters"></param>
     public void UpdateMethod(CharacterController[] _characters)
     {
+        var types = ProjectManager.Instance.GetPlayerTypes();
         for(int i = 0; i < _characters.Length; i++)
         {
-            // キャラが死んでいたら、行わない
-            if (_characters[i].GetIsDead()) { playerNumbers[i].SetActive(false); continue; }
+            if(_characters[i] == null) continue;
 
-            playerNumbers[i].SetActive(true);
+            int numbersIndex = types[i] == PlayerType.CPU ? i + ProjectManager.MaxPlayer : i;
+            // キャラが死んでいたら、行わない
+            if (_characters[i].GetIsDead()) { playerNumbers[numbersIndex].SetActive(false); continue; }
+
+            playerNumbers[numbersIndex].SetActive(true);
 
             Vector3 screenPos = Camera.main.WorldToScreenPoint(_characters[i].transform.position);
 
-            playerNumbers[i].transform.position = screenPos + (Vector3.up * playerNumberShiftPosY);
+            playerNumbers[numbersIndex].transform.position = screenPos + (Vector3.up * playerNumberShiftPosY);
         }
     }
 
@@ -83,7 +91,8 @@ public class GameUIController : MonoBehaviour
     {
         for (int i = 0; i < _characters.Length; i++)
         {
-            
+            if(_characters[i] == null) continue;
+
             _characters[i].OnDamage -= ChangeHP;
         }
     }

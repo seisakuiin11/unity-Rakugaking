@@ -13,6 +13,7 @@ public class PlayerJoinManager : MonoBehaviour
     private int currentPlayerCount = 0;
     private int firstSpace = 0;
 
+    public bool StopJoin;
 
     /// <summary> プレイヤー入室時に呼ぶ(プレイヤーのIndexを渡す) </summary>
     public event Action<int,PlayerType, int> OnPlayerJoined;
@@ -48,6 +49,8 @@ public class PlayerJoinManager : MonoBehaviour
     // 入室
     private void OnJoin(InputAction.CallbackContext context)
     {
+        if(StopJoin) return; // 外部から止められていたら
+
         // 最大人数に達していたら
         if(currentPlayerCount>= maxPlayerCount)
         {
@@ -86,7 +89,7 @@ public class PlayerJoinManager : MonoBehaviour
     /// <param name="_index">プレイヤー番号</param>
     public void OnLeft(int _index)
     {
-        Debug.Log("Left" +  _index);
+        Debug.Log("Left：Player" +  _index);
 
         // コントローラーを削除
         ControllerInputManager.Instance.RemoveController(_index);

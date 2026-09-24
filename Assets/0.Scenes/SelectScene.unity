@@ -765,7 +765,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 762627060}
-  - {fileID: 1855880642}
   - {fileID: 2021415468}
   - {fileID: 1933940129}
   - {fileID: 746706105}
@@ -825,24 +824,24 @@ MonoBehaviour:
       m_Action: Player Join Input
       m_Flags: 0
     - m_Name: 
-      m_Id: 596b950c-6ed5-4fb0-b3a0-3bf558901458
-      m_Path: <Keyboard>/f
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Player Join Input
-      m_Flags: 0
-    - m_Name: 
-      m_Id: d981a7f6-ee00-4613-98c4-6bca9f67e986
-      m_Path: <Gamepad>/buttonSouth
-      m_Interactions: 
-      m_Processors: 
-      m_Groups: 
-      m_Action: Player Join Input
-      m_Flags: 0
-    - m_Name: 
       m_Id: 62a4ea6d-0474-45e1-a004-e51bc6b79809
       m_Path: <Gamepad>/buttonEast
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Player Join Input
+      m_Flags: 0
+    - m_Name: 
+      m_Id: 7c0c2a65-4d0f-4f38-b6dd-753cf98e2dd9
+      m_Path: <Keyboard>/g
+      m_Interactions: 
+      m_Processors: 
+      m_Groups: 
+      m_Action: Player Join Input
+      m_Flags: 0
+    - m_Name: 
+      m_Id: ac1249c1-ea2f-4f3b-ba06-bcf218f011f1
+      m_Path: <Gamepad>/buttonSouth
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -851,6 +850,7 @@ MonoBehaviour:
     m_Flags: 0
   controllerPrefab: {fileID: 29517861983309840, guid: 94d857cc7cab8bd49a3ccf46aef1930d, type: 3}
   maxPlayerCount: 4
+  StopJoin: 0
 --- !u!4 &685767570
 Transform:
   m_ObjectHideFlags: 0
@@ -2388,7 +2388,7 @@ GameObject:
   - component: {fileID: 1855880644}
   - component: {fileID: 1855880643}
   m_Layer: 5
-  m_Name: SelectUI
+  m_Name: BackImg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2401,17 +2401,17 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1855880641}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 683967957}
+  m_Father: {fileID: 1933940129}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 58.9, y: 31.9}
-  m_SizeDelta: {x: 1920, y: 1080}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 1746, y: 141}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1855880643
 MonoBehaviour:
@@ -2433,7 +2433,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 636947930837874855, guid: 74ebfb6981719e544b50a2ba4f089f40, type: 3}
+  m_Sprite: {fileID: -1910748457601882430, guid: 31d978fd508f96a47a43a4f7fd240675, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -2481,6 +2481,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1855880642}
   - {fileID: 1813968417}
   - {fileID: 712561236}
   - {fileID: 1460832969}

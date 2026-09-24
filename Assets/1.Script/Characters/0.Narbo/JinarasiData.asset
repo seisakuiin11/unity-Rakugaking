@@ -21,6 +21,13 @@ MonoBehaviour:
     KnockBackPower: 20
   AllFrame: 40
   data:
+  - TargetFrame: 0
+    KnockBackNum: 0
+    colliders:
+    - radius: 1
+      localPos: {x: 0, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 1
   - TargetFrame: 20
     KnockBackNum: 0
     colliders:

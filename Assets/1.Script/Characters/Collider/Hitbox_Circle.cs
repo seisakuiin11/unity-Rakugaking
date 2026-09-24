@@ -99,23 +99,23 @@ public class Attack_Circle : Collider_Circle,IAttackCol
 
 public class PushBox_Circle : Collider_Circle
 {
-    public CharacterController controller { get; }
-
+    public CharacterCommon charaCommon { get; }
+    
     public float pastX { get; private set; }
 
     const float pushForce =0.1f;
 
 
 
-    public PushBox_Circle(CircleColData colData, CharacterController chara) : base(colData)
+    public PushBox_Circle(CircleColData colData, CharacterCommon chara) : base(colData)
     {
-        controller = chara;
+        charaCommon = chara;
         pastX = colData.worldPos.x;
     }
 
     public void Push(float xPower)
     {
-        controller.Move(new Vector2(xPower, 0));
+        charaCommon.Move(new Vector2(xPower, 0));
     }
 
     public void HitCheck(PushBox_Circle targetCol)

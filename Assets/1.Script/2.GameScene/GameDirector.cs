@@ -10,6 +10,7 @@ public class GameDirector : MonoBehaviour
 
     [SerializeField] int CountDownNum = 3;
 
+    [SerializeField] FieldController fieldController;
     [SerializeField] GameUIController gameUIController;
     [SerializeField] PlayersController playersController;
     [SerializeField] CpuController cpuController;
@@ -49,7 +50,8 @@ public class GameDirector : MonoBehaviour
         cpuController.UpdateMethod(characters);
 
         // キャラクターのアップデート処理
-        foreach (var character in characters) character.UpdateMethod(delta);
+        foreach (var character in characters)
+            if(character != null) character.UpdateMethod(delta);
 
         //コライダーコントローラーのアップデート管理
         colManager.UpdateMethod();
@@ -62,11 +64,16 @@ public class GameDirector : MonoBehaviour
     // ゲーム開始の準備
     async void GameStanby()
     {
+        // 情報の取得
+        var types = ProjectManager.Instance.GetPlayerTypes();
+        var charaIDs = ProjectManager.Instance.GetCharaIDs();
+        int maxPlayer = ProjectManager.Instance.MaxGamePlayerCount(); // (プレイヤー+エネミー)
+
         // コントローラーをGame用に変える
         ControllerInputManager.Instance.ChangeInputMode(INPUT_MODE.player);
 
         // BGM再生
-        SoundManager.Instance.BGMPlay(BGM.NARBO);
+        SoundManager.Instance.RandomBGMPlay(charaIDs);
         SoundManager.Instance.SEPlay(SE.BATTLE_START);
 
         // トランジション
@@ -74,26 +81,28 @@ public class GameDirector : MonoBehaviour
         hideTransition.SetTrigger("Hide");
         SoundManager.Instance.SEPlay(SE.MEKURU);
 
+        // フィールドの準備
+        fieldController.SetField(maxPlayer);
+
         // キャラクター生成
-        int maxPlayer = ProjectManager.Instance.MaxGamePlayerCount(); // (プレイヤー+エネミー)
-        characters = charCreater.CreateCharacters(maxPlayer);
+        characters = charCreater.CreateCharacters(types, charaIDs, maxPlayer);
 
         //　各キャラクターの初期化処理
         for (int i = 0; i < characters.Length; i++)
         {
+            if (characters[i] == null) continue;
+
             characters[i].Init(i, colManager);
         }
 
-        int charaCount = 0;
         List<CharacterController> playerChars = new(), enemyChars = new();
         // 人間とCPUに割り振る
-        foreach (var type in ProjectManager.Instance.GetPlayerTypes())
+        for (int i = 0;i < types.Length; i++)
         {
-            if(type == PlayerType.NONE) continue; // 無人 飛ばす
+            if (types[i] == PlayerType.NONE) continue; // 無人 飛ばす
 
-            if (type == PlayerType.PLAYER) playerChars.Add(characters[charaCount]);
-            else if (type == PlayerType.CPU) enemyChars.Add(characters[charaCount]);
-            charaCount++;
+            if (types[i] == PlayerType.PLAYER) playerChars.Add(characters[i]);
+            else if (types[i] == PlayerType.CPU) enemyChars.Add(characters[i]);
         }
 
         // プレイヤー管理者の初期化処理
@@ -104,7 +113,7 @@ public class GameDirector : MonoBehaviour
         cpuController.Init(enemyChars.ToArray());
 
         // UI管理者の初期化処理
-        gameUIController.Init(characters);
+        gameUIController.Init(characters, maxPlayer);
 
         // カウントダウン
         gameUIController.CountDownText(CountDownNum);
@@ -114,7 +123,8 @@ public class GameDirector : MonoBehaviour
         await Task.Delay(fadeTime); // 画面遷移待ち
 
         // キャラクターの表示
-        foreach (var chara in characters) chara.TransitionAnim("Show");
+        foreach (var chara in characters)
+            if (chara != null) chara.TransitionAnim("Show");
 
         await Task.Delay(CountDownNum * 1000);
 
@@ -126,7 +136,8 @@ public class GameDirector : MonoBehaviour
     {
         int aliveCount = 0;
         // 生存者を確認
-        foreach(var character in characters) if(!character.GetIsDead()) aliveCount++;
+        foreach(var character in characters)
+            if(character != null && !character.GetIsDead()) aliveCount++;
 
         if(aliveCount <= 1) GameEnd();
     }
@@ -139,23 +150,18 @@ public class GameDirector : MonoBehaviour
 
         gameState = GAMESTATE.WAIT;
 
-       
-       
-
         playersController.OnPause -= Pause;
         gameUIController.GameEnd(characters);
-
        
         for (int i = 0; i < characters.Length; i++)
         {
+            if (characters[i] == null) continue;
 
+            //キャラクターのrigidbodyを止める
+            characters[i].GameEnd();
 
             // 勝者ではない場合次へ
             if (characters[i].GetIsDead()) continue;
-
-
-            //キャラクターのrigidbodyを止める
-            characters[i].StopXMove();
            
             ProjectManager.Instance.SetWinner(i);
         }

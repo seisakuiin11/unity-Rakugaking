@@ -7,9 +7,10 @@ using UnityEngine;
 /// </summary>
 public class NarboLeftAttackState : AttackState
 {
-    public override void StateInit(CharacterController _chara, Animator _anim)
+
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.leftAttackFrameData;
     }
 
@@ -31,9 +32,10 @@ public class NarboLeftAttackState : AttackState
 public class NarboDownAttackState:AttackState
 {
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.downAttackFrameData;
     }
 
@@ -53,11 +55,15 @@ public class NarboDownAttackState:AttackState
 /// </summary>
 public class NarboRightAttackState : AttackState
 {
+
     private float moveDirX;         //進行方向
     private float moveSpeed=1.5f;   //攻撃中の移動速度
-    public override void StateInit(CharacterController _chara, Animator _anim)
+
+ 
+
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.rightAttackFrameData;
 
 
@@ -69,6 +75,7 @@ public class NarboRightAttackState : AttackState
         anim.SetTrigger("AttackRight");
         SoundManager.Instance.CharaSEPlay(CHARASE.NARBO_STRIKE);
         //初期の方向をキャラの向きに合わせる
+
         moveDirX = chara.transform.localScale.x;
     }
 
@@ -83,7 +90,7 @@ public class NarboRightAttackState : AttackState
 
         Vector2 moveVec = new (moveDirX*moveSpeed,0);
 
-        chara.MoveAction(moveVec);
+        charaCommon.MoveAction(moveVec);
         AttackAction();
     }
 
@@ -103,12 +110,11 @@ public class NarboUpAttackState : AttackState
 
     private int nowScaleUpCount = 0;
 
-    public override void StateInit(CharacterController _chara, Animator _anim)
+
+    public override void StateInit(CharacterController _chara, CharacterCommon _charaCommon, Animator _anim)
     {
-        base.StateInit(_chara, _anim);
+        base.StateInit(_chara, _charaCommon, _anim);
         atkData = chara.charaData.upAttackFrameData;
-
-
     }
 
     public override void StateStart()
@@ -124,9 +130,9 @@ public class NarboUpAttackState : AttackState
     public override void StateUpdateMethod(InputCommandData _inputData)
     {
         //横滑り防止
-        if (chara.GroundCheck())
+        if (charaCommon.GroundCheck())
         {
-            chara.StopXMove();
+            charaCommon.StopXMove();
         }
         if (atkData == null) chara.ChangeState(CHARA_STATE.idle);
         inputData = _inputData;
@@ -140,12 +146,11 @@ public class NarboUpAttackState : AttackState
 
             nowScaleUpCount++;
             scaleMultiplier += 0.1f;
-            Debug.Log(nowScaleUpCount);
             var scale=chara.transform.localScale;
 
             scale=scale*scaleMultiplier;
 
-            chara.ScaleChange(scale);
+            charaCommon.ScaleChange(scale);
         }
     }
 
@@ -185,7 +190,7 @@ public class NarboUpAttackState : AttackState
     protected override void AtkEnd()
     {
         base.AtkEnd();
-        chara.ScaleChange(Vector3.one);
+        charaCommon.ScaleChange(Vector3.one);
     }
 
     public override void Damage(int _damage, int _stanFrame, KnockBackData _knockBack, Collider _colPos)

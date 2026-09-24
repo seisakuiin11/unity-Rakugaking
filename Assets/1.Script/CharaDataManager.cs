@@ -47,6 +47,24 @@ public class CharaDataManagerEditor : Editor
             EditorGUILayout.Space();
         }
 
+        EditorGUILayout.Space(20);
+
+
+        // エラー用 表示
+        SerializedProperty errorProfile = serializedObject.FindProperty("errorProfile");
+        SerializedProperty errorVisual = serializedObject.FindProperty("errorVisualData");
+        SerializedProperty errorPrefab = serializedObject.FindProperty("errorPrefab");
+
+        EditorGUILayout.LabelField("エラー用キャラデータ", EditorStyles.boldLabel);
+        EditorGUILayout.Space();
+
+        // プロファイル用
+        EditorGUILayout.PropertyField(errorProfile, new GUIContent("Error_Profile"));
+        // ビジュアル用
+        EditorGUILayout.PropertyField(errorVisual, new GUIContent("Error_Visual"));
+        // Prefab用
+        EditorGUILayout.PropertyField(errorPrefab, new GUIContent("Error_Prefab"));
+
         serializedObject.ApplyModifiedProperties();
     }
 }
@@ -73,6 +91,11 @@ public class CharaDataManager : MonoBehaviour
     [SerializeField] CharaVisualData[] charaVisualDatas;
     [SerializeField] CharacterController[] characterPrefabs;
 
+    [SerializeField] CharacterProfile errorProfile;
+    [SerializeField] CharaVisualData errorVisualData;
+    [SerializeField] CharacterController errorPrefab;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -95,9 +118,9 @@ public class CharaDataManager : MonoBehaviour
     /// <returns></returns>
     public CharacterProfile GetCharacterProfile(int id)
     {
-        if (id < 0 || id >= characterPrefabs.Length) { Debug.LogError($"ID{id}は存在しません。"); return null; }
+        if (id < 0 || id >= characterProfiles.Length) { Debug.LogError($"ID{id}は存在しません。"); return errorProfile; }
 
-        if (characterProfiles[id] == null) { Debug.LogError("Profileがありません。"); return null; }
+        if (characterProfiles[id] == null) { Debug.LogError("Profileがありません。"); return errorProfile; }
 
         return characterProfiles[id];
     }
@@ -114,9 +137,9 @@ public class CharaDataManager : MonoBehaviour
     /// <returns></returns>
     public CharaVisualData GetVisualData(int id)
     {
-        if (id < 0 || id >= characterPrefabs.Length) { Debug.LogError($"ID{id}は存在しません。"); return null; }
+        if (id < 0 || id >= charaVisualDatas.Length) { Debug.LogError($"ID{id}は存在しません。"); return errorVisualData; }
 
-        if (charaVisualDatas[id] == null) { Debug.LogError("ビジュアルデータがありません。"); return null; }
+        if (charaVisualDatas[id] == null) { Debug.LogError("ビジュアルデータがありません。"); return errorVisualData; }
 
         return charaVisualDatas[id];
     }
@@ -142,9 +165,9 @@ public class CharaDataManager : MonoBehaviour
     /// <returns></returns>
     public CharacterController GetCharaPrefab(int id)
     {
-        if(id < 0 || id >= characterPrefabs.Length) { Debug.LogError($"ID{id}は存在しません。"); return null; }
+        if(id < 0 || id >= characterPrefabs.Length) { Debug.LogError($"ID{id}は存在しません。"); return errorPrefab; }
 
-        if (characterPrefabs[id] == null) { Debug.LogError("Prefabがありません。"); return null; }
+        if (characterPrefabs[id] == null) { Debug.LogError("Prefabがありません。"); return errorPrefab; }
 
         return characterPrefabs[id];
     }

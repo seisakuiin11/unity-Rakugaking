@@ -64,6 +64,7 @@ public class SelectDirector : MonoBehaviour
             if (type == PlayerType.PLAYER) JoinPlayer(i, type, i); // 人間なら
             else playerWindows[i].JoinPlayer(type, 0); // CPUなら
 
+            // キャラクターの設定
             AcceptCharaID(i, charaIDs[i]);
             if(type == PlayerType.CPU) playerWindows[i].SetActiveAccessPlayerIcon(0, false, false);
         }
@@ -247,6 +248,7 @@ public class SelectDirector : MonoBehaviour
     {
         // 入力に関する処理をすべて止める
         stopProcess = true;
+        joinManager.StopJoin = true;
 
         // 最大人数
         int maxPlayer = ProjectManager.MaxPlayer;
@@ -304,6 +306,7 @@ public class SelectDirector : MonoBehaviour
     {
         // 入力に関する処理をすべて止める
         stopProcess = true;
+        joinManager.StopJoin = true;
 
         SoundManager.Instance.SEPlay(SE.BACK);
 

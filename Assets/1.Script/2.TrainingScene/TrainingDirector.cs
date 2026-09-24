@@ -10,6 +10,7 @@ public class TrainingDirector : MonoBehaviour
     [SerializeField] Animator hideTransition;
     [SerializeField] int fadeTime;
 
+    [SerializeField] FieldController fieldController;
     [SerializeField] GameUIController gameUIController;
     [SerializeField] PlayersController playersController;
     [SerializeField] CharacterCreater charCreater;
@@ -45,7 +46,8 @@ public class TrainingDirector : MonoBehaviour
         float delta = Time.deltaTime;
 
         // キャラクターのアップデート処理
-        foreach (var character in characters) character.UpdateMethod(delta);
+        foreach (var character in characters)
+            if(character != null) character.UpdateMethod(delta);
 
         //コライダーコントローラーのアップデート管理
         colManager.UpdateMethod();
@@ -56,6 +58,11 @@ public class TrainingDirector : MonoBehaviour
     // ゲーム開始の準備
     async void GameStanby()
     {
+        // 各種データを取得
+        var types = ProjectManager.Instance.GetPlayerTypes();
+        var charaIDs = ProjectManager.Instance.GetCharaIDs();
+        int maxPlayer = ProjectManager.Instance.MaxGamePlayerCount(); // (プレイヤー+エネミー)
+
         // BGM 再生
         SoundManager.Instance.BGMPlay(BGM.SELECT);
 
@@ -65,27 +72,29 @@ public class TrainingDirector : MonoBehaviour
         gameState = GAMESTATE.WAIT;
         hideTransition.gameObject.SetActive(true);
 
+        // フィールドの準備
+        fieldController.SetField(maxPlayer);
+
         // キャラクター生成
-        int maxPlayer = ProjectManager.Instance.MaxGamePlayerCount(); // (プレイヤー+エネミー)
-        characters = charCreater.CreateCharacters(maxPlayer);
+        characters = charCreater.CreateCharacters(types, charaIDs, maxPlayer);
 
         //　各キャラクターの初期化処理
         for (int i = 0; i < characters.Length; i++)
         {
+            if (characters[i] == null) continue;
+
             characters[i].Init(i, colManager);
             characters[i].OnDead += OnRevive; // 死んだら復活する処理を格納
         }
 
-        int charaCount = 0;
         List<CharacterController> playerChars = new(), enemyChars = new();
         // 人間とCPUに割り振る
-        foreach (var type in ProjectManager.Instance.GetPlayerTypes())
+        for (int i = 0; i < types.Length; i++)
         {
-            if (type == PlayerType.NONE) continue; // 無人 飛ばす
+            if (types[i] == PlayerType.NONE) continue; // 無人 飛ばす
 
-            if (type == PlayerType.PLAYER) playerChars.Add(characters[charaCount]);
-            else if (type == PlayerType.CPU) enemyChars.Add(characters[charaCount]);
-            charaCount++;
+            if (types[i] == PlayerType.PLAYER) playerChars.Add(characters[i]);
+            else if (types[i] == PlayerType.CPU) enemyChars.Add(characters[i]);
         }
 
         // プレイヤー管理者の初期化処理
@@ -95,7 +104,7 @@ public class TrainingDirector : MonoBehaviour
         // CPU管理者の初期化処理
 
         // UI管理者の初期化処理
-        gameUIController.Init(characters);
+        gameUIController.Init(characters, maxPlayer);
 
 
         // トランジション
@@ -103,7 +112,8 @@ public class TrainingDirector : MonoBehaviour
         SoundManager.Instance.SEPlay(SE.MEKURU);
 
         // キャラの登場アニメーション
-        foreach (var chara in characters) chara.TransitionAnim("Show");
+        foreach (var chara in characters)
+            if(chara != null) chara.TransitionAnim("Show");
 
         await Task.Delay(fadeTime);
 
@@ -120,7 +130,8 @@ public class TrainingDirector : MonoBehaviour
 
         gameState = GAMESTATE.WAIT;
 
-        foreach (var chara in characters) chara.OnDead -= OnRevive;
+        foreach (var chara in characters)
+            if(chara != null) chara.OnDead -= OnRevive;
         playersController.OnPause -= Pause;
         gameUIController.GameEnd(characters);
 

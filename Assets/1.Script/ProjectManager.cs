@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Linq;
+using System.Collections.Generic;
 
 
 /// <summary>
@@ -24,6 +25,9 @@ public class ProjectManager : MonoBehaviour
 
     /// <summary> 次の次のシーンを予約する用 </summary>
     public SceneName NextScene;
+    [SerializeField] bool LoopSceneFlag;
+    SceneName LoopScene;
+    bool LoopSceneFlagOld;
 
     [SerializeField] int[] charaIDs;            // 選択したキャラたちのIDが格納させる
     [SerializeField] PlayerType[] playerTypes;  // ○Pが人間かCPUか
@@ -62,8 +66,11 @@ public class ProjectManager : MonoBehaviour
 #if UNITY_EDITOR
         // デバッグ用 ゲームシーンスタートなら
         if (NextScene > SceneName.SelectScene) _scene = SceneName.JoinScene;
+        if (LoopSceneFlag) LoopScene = NextScene;
+        LoopSceneFlagOld = LoopSceneFlag;
 #else
         // 初期化 - タイトルスタート
+        LoopSceneFlag = false;
         NextScene = SceneName.TitleScene;
         _scene = SceneName.TitleScene;
 #endif
@@ -75,11 +82,22 @@ public class ProjectManager : MonoBehaviour
         ChangeScene(_scene);
     }
 
+#if UNITY_EDITOR
+    private void FixedUpdate()
+    {
+        if(LoopSceneFlag && !LoopSceneFlagOld) LoopScene = NextScene;
+        LoopSceneFlagOld = LoopSceneFlag;
+    }
+#endif
+
     /// <summary>
     /// 指定シーンに切り替える
     /// </summary>
     public void ChangeScene(SceneName sceneName)
     {
+#if UNITY_EDITOR
+        if (LoopSceneFlag && sceneName != SceneName.JoinScene) sceneName = LoopScene;
+#endif
         sceneLoder.ChangeScene(sceneName);
     }
 

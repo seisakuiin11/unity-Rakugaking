@@ -13,11 +13,11 @@ MonoBehaviour:
   m_Name: WasshoiData
   m_EditorClassIdentifier: Assembly-CSharp::AttackData
   AtkDamage: 250
-  AtkHitStanFrame: 50
+  AtkHitStanFrame: 20
   KnockBackData:
-  - KnockBackFlip: 0
+  - KnockBackFlip: 2
     Vector: 0
-    KnockBackVec: {x: 0, y: 1}
+    KnockBackVec: {x: 0.3, y: 1}
     KnockBackPower: 20
   AllFrame: 30
   data:

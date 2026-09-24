@@ -141,9 +141,9 @@ public class ColliderManager : MonoBehaviour
     /// <param name="colData"></param>
     /// <param name="chara"></param>
     /// <returns></returns>
-    public PushBox_Circle UpdatePushBoxColliderData(CircleColData colData,CharacterController chara)
+    public PushBox_Circle UpdatePushBoxColliderData(CircleColData colData, CharacterCommon charaCommon)
     {
-        var newCol = new PushBox_Circle(colData, chara);
+        var newCol = new PushBox_Circle(colData, charaCommon);
         
         pushBoxList.Add(newCol);
 
