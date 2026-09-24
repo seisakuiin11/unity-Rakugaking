@@ -3,6 +3,7 @@
 落書きをモチーフに、個性あるキャラクターたちが繰り広げるハチャメチャバトル。<br>
 &nbsp;
 !["タイトル"](./RepositoryImages/TitleImage.png)
+!["紹介動画"](./RepositoryImages/らくがきんぐ_紹介映像.mp4)
 
 ## 開発ポイント
 ProjectManagerがゲーム全体の管理を担当。<br>
