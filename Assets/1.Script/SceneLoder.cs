@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public enum SceneName
 {
     TitleScene,
+    PaintScene,
     TutorialScene,
     SelectScene,
     GameScene,

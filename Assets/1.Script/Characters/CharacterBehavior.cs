@@ -19,6 +19,7 @@ public class CharacterBehavior:MonoBehaviour
     /// </summary>
     virtual public void Init(ColliderManager _colManager)
     {
+        Debug.Log("init");
         colManager = _colManager;
         return;
     }

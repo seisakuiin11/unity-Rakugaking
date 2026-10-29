@@ -153,19 +153,24 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dab2d70491de1cf4ab2f19eb78b9b815, type: 2}
   - {fileID: 11400000, guid: c724909e1a7807245b48512481dcc5dd, type: 2}
   - {fileID: 11400000, guid: 4259d2768a77d1b4a8d57fe8e3e4f214, type: 2}
+  - {fileID: 11400000, guid: 2d554c0f31c76124581af80bd7831be0, type: 2}
   charaVisualDatas:
   - {fileID: 11400000, guid: c19e8b7412622014abcc6cd5c60f5bfa, type: 2}
   - {fileID: 11400000, guid: 5f183033a946c364f89d325868767a17, type: 2}
   - {fileID: 11400000, guid: 10e764697243fcf44adc1823eaee16bd, type: 2}
   - {fileID: 11400000, guid: fe8de5a982ea18147bfb97be9b019b00, type: 2}
+  - {fileID: 11400000, guid: a2e226a746b5dde4e9313947c0f662fd, type: 2}
   characterPrefabs:
-  - {fileID: 9132147412365986167, guid: 988bd96b3a5ffe44fb8a80f682287711, type: 3}
+  - {fileID: 4235867089360198906, guid: 08a0610579f910b47ae7ff91e164fc0c, type: 3}
   - {fileID: 9132147412365986167, guid: baefd92f5550fd746b9433a8cd6955ec, type: 3}
   - {fileID: 9132147412365986167, guid: 4cf2aef3ceeca7a4691e57274e778a09, type: 3}
   - {fileID: 9132147412365986167, guid: 6422195e516dd8241b1d0be523606d32, type: 3}
+  - {fileID: 9132147412365986167, guid: 0a94ee39bac9ca74e94da730130536e3, type: 3}
   errorProfile: {fileID: 11400000, guid: d31ff08ea2933884089454d62c4290da, type: 2}
   errorVisualData: {fileID: 11400000, guid: 6db86a606a67ba149b8f67d969607032, type: 2}
   errorPrefab: {fileID: 9132147412365986167, guid: ee45e9da9b1d83b4a8cadd651ff8a7d7, type: 3}
+  modelVisualDatas:
+  - {fileID: 11400000, guid: fef628cf3ae3cc44984dada69423202a, type: 2}
 --- !u!4 &409214318
 Transform:
   m_ObjectHideFlags: 0
@@ -905,12 +910,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a67cbd6779edb04eaa4486680f1fe50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NextScene: 4
+  NextScene: 0
   LoopSceneFlag: 0
-  charaIDs: 03000000030000000000000002000000
-  playerTypes: 01020102
+  charaIDs: 01000000030000000000000000000000
+  skinNums: 00000000000000000000000000000000
+  playerTypes: 01020000
   winnerIndex: 1
   soundManager: {fileID: 1060987555}
+  charaDataManager: {fileID: 409214317}
   backImg: {fileID: 1465920114}
 --- !u!1 &1465920114
 GameObject:

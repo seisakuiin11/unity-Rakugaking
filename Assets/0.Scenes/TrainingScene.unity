@@ -1231,7 +1231,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1034026970
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1324,17 +1324,17 @@ MonoBehaviour:
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
-  m_ActionsAsset: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_PointAction: {fileID: -7320079887541534295, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_MoveAction: {fileID: -1286885415785918093, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_SubmitAction: {fileID: -7600635524659206360, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_CancelAction: {fileID: 165548170928538787, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_LeftClickAction: {fileID: 3403586097412597960, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_MiddleClickAction: {fileID: -8875370212561535492, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_RightClickAction: {fileID: 7436903960174322660, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_ScrollWheelAction: {fileID: 962634495172767333, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_TrackedDevicePositionAction: {fileID: -3955344344432064756, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
-  m_TrackedDeviceOrientationAction: {fileID: 2206890984921099539, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
@@ -1831,6 +1831,7 @@ GameObject:
   - component: {fileID: 1501676010}
   - component: {fileID: 1501676009}
   - component: {fileID: 1501676008}
+  - component: {fileID: 1501676011}
   m_Layer: 5
   m_Name: NoBtn
   m_TagString: Untagged
@@ -1952,6 +1953,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1501676006}
   m_CullTransparentMesh: 1
+--- !u!114 &1501676011
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1501676006}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4c2d483370cf5a4d8f411692a49ce85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1502745030
 GameObject:
   m_ObjectHideFlags: 0
@@ -2399,6 +2412,7 @@ GameObject:
   - component: {fileID: 1992842944}
   - component: {fileID: 1992842943}
   - component: {fileID: 1992842942}
+  - component: {fileID: 1992842945}
   m_Layer: 5
   m_Name: YesBtn
   m_TagString: Untagged
@@ -2520,6 +2534,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1992842940}
   m_CullTransparentMesh: 1
+--- !u!114 &1992842945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1992842940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4c2d483370cf5a4d8f411692a49ce85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2079780158
 GameObject:
   m_ObjectHideFlags: 0

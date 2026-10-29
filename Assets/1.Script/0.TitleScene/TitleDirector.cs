@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class TitleDirector : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class TitleDirector : MonoBehaviour
     bool openQuitUI;
     const int waitTime = 500;
     bool waitFlag;
+    private GameObject lastSelected;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -33,6 +35,27 @@ public class TitleDirector : MonoBehaviour
         hideTransition.gameObject.SetActive(true);
         hideTransition.SetTrigger("Hide");
         SoundManager.Instance.SEPlay(SE.MEKURU);
+    }
+
+    void Update()
+    {
+        if (!enterFlag) return;
+
+        // 査収選択ボタンを維持する処理
+        GameObject current = eventSystem.currentSelectedGameObject;
+
+        if (current != null)
+        {
+            // 現在の選択中ボタンを記憶する
+            Selectable selectable = current.GetComponent<Selectable>();
+            if (selectable != null && selectable.IsInteractable()) lastSelected = current;
+        }
+        else if (lastSelected != null && lastSelected.activeInHierarchy)
+        {
+            // 選択中ボタンが存在しないなら、最後に選択していたボタンをセットする
+            Selectable selectable = lastSelected.GetComponent<Selectable>();
+            if (selectable != null && selectable.IsInteractable()) eventSystem.SetSelectedGameObject(lastSelected);
+        }
     }
 
     // コントローラー起因処理 ===============================================================
@@ -82,7 +105,7 @@ public class TitleDirector : MonoBehaviour
     /// <param name="sceneName"></param>
     public async void NextScene(string sceneName)
     {
-        if (waitFlag) return;
+        if (!enterFlag || waitFlag) return;
         SetWaitFlag();
 
         // enum変換
@@ -100,8 +123,8 @@ public class TitleDirector : MonoBehaviour
         Debug.Log(scene);
         ProjectManager.Instance.NextScene = scene;
 
-        // チュートリアルなら、キャラ選択へいかない
-        if (scene == SceneName.TutorialScene) ProjectManager.Instance.ChangeScene(scene);
+        // チュートリアル,らくがきなら、キャラ選択へいかない
+        if (scene == SceneName.TutorialScene || scene == SceneName.PaintScene) ProjectManager.Instance.ChangeScene(scene);
         else ProjectManager.Instance.ChangeScene(SceneName.SelectScene);
     }
 

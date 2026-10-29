@@ -106,6 +106,7 @@ public class CharacterController : MonoBehaviour
 
         //キャラ固有スクリプトを取得
         charaBehavior =GetComponent<CharacterBehavior>();
+        Debug.Log(charaBehavior,charaBehavior);
         charaBehavior.Init(colManager);
 
         //各ステートの情報を挿入
@@ -127,6 +128,7 @@ public class CharacterController : MonoBehaviour
         //各ステートに初回情報を挿入
         foreach (var state in stateDictionary)
         {
+            Debug.Log(state);
             state.Value.StateInit(this,charaCommon ,anim);
         }
 
@@ -379,18 +381,7 @@ public class CharacterController : MonoBehaviour
         return stanFrame <= 0;
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
 
-        CapsuleCollider2D pCol = GetComponent<CapsuleCollider2D>();
-        var pColHeightHalf = pCol.size.y/ 2;
-        Ray hit = new Ray(transform.position + Vector3.down * (pColHeightHalf + 0.01f), Vector2.down);
-   
-        Gizmos.DrawRay(hit);
-
-
-    }
 
     
 }

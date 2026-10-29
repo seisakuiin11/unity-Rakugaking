@@ -148,6 +148,8 @@ public class NarboUpAttackState : AttackState
             scaleMultiplier += 0.1f;
             var scale=chara.transform.localScale;
 
+            scale.x=Mathf.Abs(scale.x);
+
             scale=scale*scaleMultiplier;
 
             charaCommon.ScaleChange(scale);
@@ -178,7 +180,7 @@ public class NarboUpAttackState : AttackState
         //現在のフレーム数がキーフレームの値以上になったらコライダー情報を更新
         if (atkNowFrame >= atkFrameData[targetFrameIndex].TargetFrame)
         {
-            anim.SetTrigger("Daibakuhatu");
+            if(!atkFlag)anim.SetTrigger("Daibakuhatu");
             atkFlag = true;
             ColliderAction();
             SoundManager.Instance.CharaSEPlay(CHARASE.NARBO_DAIBAKUHATU);

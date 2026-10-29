@@ -81,6 +81,10 @@ public class ZeraBehavior : CharacterBehavior
     }
 
     //------------------ƒgƒQƒgƒQŠÖŒW
+
+    /// <summary>
+    /// ‚Æ‚°¢Š«
+    /// </summary>
     public void SummonSpike()
     {
         Vector3 pos= transform.position;
@@ -95,6 +99,10 @@ public class ZeraBehavior : CharacterBehavior
         spikeController.Init(colManager,this);
     }
 
+
+    /// <summary>
+    /// ‚Æ‚°‰Î—Íã¸
+    /// </summary>
     public void SpikeStackUp()
     {
       @spikeController.SpikeStackUp();
@@ -106,8 +114,14 @@ public class ZeraBehavior : CharacterBehavior
         spikeObject.transform.localScale = new Vector3(transform.localScale.x, 1, 1);
     }
 
+
+    /// <summary>
+    /// ‚Æ‚°Ëo
+    /// </summary>
     public void SpikeShot()
     {
+        //Œü‚«’²®
+        spikeObject.transform.localScale = new Vector3(transform.localScale.x, 1, 1);
         spikeController.Shot(transform.localScale.x);
     }
 

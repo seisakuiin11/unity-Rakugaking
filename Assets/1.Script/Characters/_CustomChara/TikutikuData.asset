@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3721889ef50856e439a89d27353d1865, type: 3}
+  m_Name: TikutikuData
+  m_EditorClassIdentifier: 
+  AtkDamage: 400
+  AtkHitStanFrame: 10
+  KnockBackData:
+  - KnockBackFlip: 0
+    Vector: 0
+    KnockBackVec: {x: 0, y: 1}
+    KnockBackPower: 10
+  AllFrame: 83
+  data:
+  - TargetFrame: 0
+    KnockBackNum: 0
+    colliders:
+    - radius: 1
+      localPos: {x: 0, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 1
+  - TargetFrame: 83
+    KnockBackNum: 0
+    colliders:
+    - radius: 1
+      localPos: {x: 0, y: 0, z: 0}
+      trans: {fileID: 0}
+      colType: 1
+  palameters:
+  - name: "\u30C1\u30E3\u30FC\u30B8\u6642\u9593 (\u30D5\u30EC\u30FC\u30E0\u5358\u4F4D)"
+    value: 51
+  - name: "\u5F53\u305F\u308A\u5224\u5B9A\u306E\u30A2\u30AF\u30C6\u30A3\u30D6\u7D99\u7D9A\u6642\u9593"
+    value: 15
+  prefabs: []

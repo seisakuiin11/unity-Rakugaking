@@ -17,7 +17,7 @@ public class ControllerInput : MonoBehaviour
     Vector2 moveInput;                              //移動方向
     ButtonState jump,shield;                        //ジャンプ、シールドのボタンの状態
     ButtonState atkUp, atkDown, atkLeft, atkRight;  //各攻撃のボタンの状態
-    bool pauseFlag=false;                           //ポーズボタン
+    ButtonState pauseFlag;                          //ポーズボタン
 
     // UI中の入力変数
     Vector2 navigate;                               //方向
@@ -110,8 +110,8 @@ public class ControllerInput : MonoBehaviour
             ATTACK_LEFT = atkLeft,
             ATTACK_RIGHT = atkRight,
             JUMP = jump,
-            SHIELD=shield,
-            PAUSE=pauseFlag
+            SHIELD = shield,
+            PAUSE = pauseFlag
         };
 
         SetGameButtonSaveFlag();
@@ -128,6 +128,8 @@ public class ControllerInput : MonoBehaviour
         atkLeft.Save();
         atkRight.Save();
         jump.Save();
+        shield.Save();
+        pauseFlag.Save();
     }
 
     //---------------------------------------------------------------UI操作中に呼ばれる関数
@@ -209,7 +211,7 @@ public class ControllerInput : MonoBehaviour
 
     public void OnPause(InputAction.CallbackContext context)
     {
-        pauseFlag = context.performed;
+        pauseFlag.Set(context.performed);
     }
 
 

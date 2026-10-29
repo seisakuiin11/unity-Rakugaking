@@ -20,6 +20,8 @@ public class EffectController : MonoBehaviour
 
     private void Update()
     {
+        if (effectText == null) return;
+
         var vec = effectText.localScale;
         vec.x *= System.Math.Sign(effectText.lossyScale.normalized.x);
         effectText.localScale = vec;
@@ -27,6 +29,8 @@ public class EffectController : MonoBehaviour
 
     public void PlayEffect(EffectType type)
     {
+        if(effect == null) return;
+
         if (effectType == type.ToString()) return;
 
         effectType = type.ToString();
@@ -35,6 +39,8 @@ public class EffectController : MonoBehaviour
 
     public void PlayUniqueEffect(string type)
     {
+        if(effect == null) return;
+
         if (effectType == type) return;
 
         effectType = type;

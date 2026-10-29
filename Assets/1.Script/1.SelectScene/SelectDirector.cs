@@ -55,6 +55,7 @@ public class SelectDirector : MonoBehaviour
 
         // ウィンドウにキャラ設定
         var charaIDs = ProjectManager.Instance.GetCharaIDs();
+        var skinNums = ProjectManager.Instance.GetSkinNums();
         var playerTypes = ProjectManager.Instance.GetPlayerTypes();
         for (int i = 0; i < playerWindows.Length; i++)
         {
@@ -65,6 +66,7 @@ public class SelectDirector : MonoBehaviour
             else playerWindows[i].JoinPlayer(type, 0); // CPUなら
 
             // キャラクターの設定
+            playerWindows[i].SetSkinNum(skinNums[i]);
             AcceptCharaID(i, charaIDs[i]);
             if(type == PlayerType.CPU) playerWindows[i].SetActiveAccessPlayerIcon(0, false, false);
         }
@@ -172,6 +174,8 @@ public class SelectDirector : MonoBehaviour
         data.ACCEPT = inputData.SUBMIT.IsReleased;
         data.CANCEL = inputData.CANCEL.IsReleased;
         data.START = inputData.START.IsReleased;
+        data.L_MOVE = inputData.L_BUTTON.IsPressed;
+        data.R_MOVE = inputData.R_BUTTON.IsPressed;
 
         // 入力情報を過去情報として保存
         direction_old[num] = inputData.DIRECTION_DATA;
@@ -255,17 +259,19 @@ public class SelectDirector : MonoBehaviour
 
         // キャラIDと操作プレイヤーのタイプ
         int[] charaIDs = new int[maxPlayer];
+        int[] skinNums = new int[maxPlayer];
         PlayerType[] playerTypes = new PlayerType[maxPlayer];
 
         // 各ウィンドウから情報取得
         for(int i = 0; i < playerWindows.Length; i++)
         {
             charaIDs[i] = playerWindows[i].GetCharaID();
+            skinNums[i] = playerWindows[i].GetSkinNum();
             playerTypes[i] = playerWindows[i].GetPlayerType();
         }
 
         // 各プレイヤーの選択したキャラIDを渡す
-        ProjectManager.Instance.SetCharaIDs(charaIDs, playerTypes);
+        ProjectManager.Instance.SetCharaIDs(charaIDs, skinNums, playerTypes);
 
         Debug.Log("次のシーンへ");
 

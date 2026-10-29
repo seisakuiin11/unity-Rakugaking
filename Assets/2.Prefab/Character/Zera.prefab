@@ -123,8 +123,8 @@ GameObject:
   - component: {fileID: 9132147412365986167}
   - component: {fileID: 7391923394256948122}
   - component: {fileID: 4042453791925665867}
-  - component: {fileID: 769594930785852654}
   - component: {fileID: 2334300250252578118}
+  - component: {fileID: 8081172381273168047}
   m_Layer: 6
   m_Name: Zera
   m_TagString: Player
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb38bfb367760a2479e5684912c99f25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  capsuleCol: {fileID: 769594930785852654}
+  capsuleCol: {fileID: 0}
   shieldObject: {fileID: 5423452663754683142}
   stanFrame: 120
   shieldBreakKnockBack: {x: 0, y: 30}
@@ -213,8 +213,29 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!70 &769594930785852654
-CapsuleCollider2D:
+--- !u!114 &2334300250252578118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973439399624765838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb85ba49a2f1894d9bde926082bd6f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spikePrefab: {fileID: 2223699313769467158, guid: 5367b7858314ad04da4b78b4f8dc64ca, type: 3}
+  counterColData:
+  - radius: 2
+    localPos: {x: 0, y: 0, z: 0}
+    trans: {fileID: 0}
+    colType: 0
+  counterAtkData: {fileID: 11400000, guid: 5a6a38b1fc7df474abe6a08b1c7e19e8, type: 2}
+  failParryStanFrame: 60
+  beamObject: {fileID: 461004333031793717}
+--- !u!61 &8081172381273168047
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -248,29 +269,17 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 2, y: 4}
-  m_Direction: 0
---- !u!114 &2334300250252578118
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3973439399624765838}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdb85ba49a2f1894d9bde926082bd6f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spikePrefab: {fileID: 2223699313769467158, guid: 5367b7858314ad04da4b78b4f8dc64ca, type: 3}
-  counterColData:
-  - radius: 2
-    localPos: {x: 0, y: 0, z: 0}
-    trans: {fileID: 0}
-    colType: 0
-  counterAtkData: {fileID: 11400000, guid: 5a6a38b1fc7df474abe6a08b1c7e19e8, type: 2}
-  failParryStanFrame: 60
-  beamObject: {fileID: 461004333031793717}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.35, y: 4}
+  m_EdgeRadius: 0
 --- !u!1 &6791740610579806310
 GameObject:
   m_ObjectHideFlags: 0

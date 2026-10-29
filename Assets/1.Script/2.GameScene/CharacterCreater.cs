@@ -16,6 +16,9 @@ public class CharacterCreater : MonoBehaviour
     /// <returns>生成したキャラクター達を配列で返す</returns>
     public CharacterController[] CreateCharacters(PlayerType[] types, int[] charaIDs, int maxPlayer)
     {
+        // スキンIDを取得
+        var skinNums = ProjectManager.Instance.GetSkinNums();
+
         // 参加人数が2人以下かそうでないか
         Vector3 createCenterPos = maxPlayer <= 2 ? createCenterPos_2P : createCenterPos_4P;
         var characters = new CharacterController[types.Length];
@@ -35,7 +38,16 @@ public class CharacterCreater : MonoBehaviour
             obj.transform.position = createCenterPos;   // 原点
             obj.transform.Translate((createDistance * num) - harfLength, 0, 0); // ずらす
             characters[i] = obj;
+
             num++;
+
+            // スキンの変更
+            var model = obj.transform.GetComponentInChildren<ModelVisual>();
+
+            if (model == null) continue;
+
+            var vs = CharaDataManager.Instance.GetModelVisualData(skinNums[i]);
+            model.AttachVisual(vs);
         }
 
         return characters;

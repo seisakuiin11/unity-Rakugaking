@@ -122,7 +122,7 @@ public class IdleState : CharacterStateBase
 
         if (chara.ShieldCheck()) { chara.ChangeState(CHARA_STATE.shield); return; }
 
-        if (chara.MoveCheck()) { chara.ChangeState(CHARA_STATE.move); return; }
+        if (chara.MoveCheck()&&!charaCommon.UpCheck()) { chara.ChangeState(CHARA_STATE.move); return; }
 
         if (chara.AttackCheck()) return;
 
@@ -132,7 +132,7 @@ public class IdleState : CharacterStateBase
 
         if(_inputData.DIRECTION_DATA==DIRECTIONDATA.DOWN && charaCommon.FootingGroundCheck(out var col))  { charaCommon.FootingGroundOff(col);}
 
-        charaCommon.StopXMove();
+        if(!charaCommon.UpCheck()) charaCommon.StopXMove();
         charaCommon.ShieldHeal();
     }
 
@@ -189,7 +189,7 @@ public class MoveState : CharacterStateBase
     public override void StateEnd()
     {
         var rb =chara.GetRigidBody();
-        rb.linearVelocity = Vector2.zero;
+        var velocity = rb.linearVelocity;
     }
 
 }
@@ -266,7 +266,9 @@ public class AirState : CharacterStateBase
         if (chara.AttackCheck()) return;
 
         if (chara.MoveCheck()) charaCommon.FixedMoveAction(inputData.DIRECTION_VEC2);
-       
+
+        if (chara.ShieldCheck()) { chara.ChangeState(CHARA_STATE.shield); return; }
+
         charaCommon.ShieldHeal();
     }
 
@@ -304,6 +306,7 @@ public class StanState : CharacterStateBase
     {
         charaCommon.stanFrame--;
         if (charaCommon.stanFrame<=0) chara.ChangeState(CHARA_STATE.idle);
+
         
 
     }
@@ -428,7 +431,7 @@ public class AttackState : CharacterStateBase
         //アタックデータが格納されていない場合idleにもどる
         if (atkData == null)
         {
-            UnityEngine.Debug.Log("攻撃データなし");
+            Debug.Log("攻撃データなし");
             chara.ChangeState(CHARA_STATE.idle);
             return;
         }

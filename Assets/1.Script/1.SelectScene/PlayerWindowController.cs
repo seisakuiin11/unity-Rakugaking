@@ -19,11 +19,13 @@ public class PlayerWindowController : MonoBehaviour
     [SerializeField] TextMeshProUGUI nameText_Accept;
     [SerializeField] TextMeshProUGUI[] skillNameText_Accept;
     [SerializeField] Image charaImg;
+    [SerializeField] GameObject skinChangeIcon;
 
     [SerializeField, Header("アクセスプレイヤーアイコン")] Animator[] accessPlayerIcons;
     [SerializeField, Header("決定アイコン")] GameObject acceptImg;
 
     [Header("素材")]
+    [SerializeField] GameObject noneText;
     [SerializeField] Sprite noneWindow;
     [SerializeField] Sprite playerWindow;
     [SerializeField] Sprite cpuWindow;
@@ -36,6 +38,7 @@ public class PlayerWindowController : MonoBehaviour
     int index;
     PlayerType playerType;
     int charaID;
+    int skinNum;
     int playerNum = -1;
     int accessPlayer = -1;
 
@@ -83,7 +86,19 @@ public class PlayerWindowController : MonoBehaviour
         // 不参加
         if(inputData.CANCEL) { OnLeftPlayer(index,_playerNum); return; }
 
-        // CPUの強さ設定
+        // スキンの切り替え
+        if (inputData.R_MOVE)
+        {
+            skinNum = CharaDataManager.Instance.SkinNumShift(charaID, skinNum, 1);
+            SetDataAccept(charaID);
+        }
+
+        // スキンの切り替え
+        if (inputData.L_MOVE)
+        {
+            skinNum = CharaDataManager.Instance.SkinNumShift(charaID, skinNum, -1);
+            SetDataAccept(charaID);
+        }
     }
 
     /// <summary>
@@ -97,6 +112,7 @@ public class PlayerWindowController : MonoBehaviour
         playerNum = -1;
 
         // ウィンドウを変えて非表示
+        noneText.SetActive(true);
         window.sprite = noneWindow;
         textSelectArea.SetActive(false);
         textAcceptArea.SetActive(false);
@@ -132,6 +148,7 @@ public class PlayerWindowController : MonoBehaviour
         {
             window.sprite= cpuWindow;
         }
+        noneText.SetActive(false);
 
         SetActiveAccessPlayerIcon(_accessPlayer, true, true);
         acceptImg.SetActive(false);
@@ -165,12 +182,15 @@ public class PlayerWindowController : MonoBehaviour
 
         // 確定アイコン表示
         acceptImg.SetActive(true);
+
+        // モデルなら、スキンチェンジアイコンを表示する
+        skinChangeIcon.SetActive(charaID >= (int)CharaDataManager.CharaID.MODEL_1);
     }
 
     // テキストデータを設定する
     void SetDataSelect(int id)
     {
-        var visu = CharaDataManager.Instance.GetVisualData(id);
+        var visu = CharaDataManager.Instance.GetVisualData(id, skinNum);
         charaImg_Select.sprite = visu.BustUp;
 
         var profile = CharaDataManager.Instance.GetCharacterProfile(id);
@@ -193,7 +213,7 @@ public class PlayerWindowController : MonoBehaviour
 
     void SetDataAccept(int id)
     {
-        var visu = CharaDataManager.Instance.GetVisualData(id);
+        var visu = CharaDataManager.Instance.GetVisualData(id, skinNum);
         charaImg.sprite = visu.BustUp;
 
         var profile = CharaDataManager.Instance.GetCharacterProfile(id);
@@ -224,6 +244,18 @@ public class PlayerWindowController : MonoBehaviour
     /// キャラIDを返す（不参加枠なら-1を返す）
     /// </summary>
     public int GetCharaID() { return playerType == PlayerType.NONE ? -1 : charaID; }
+
+    /// <summary>
+    /// スキンIDを返す
+    /// </summary>
+    /// <returns></returns>
+    public int GetSkinNum() => skinNum;
+
+    /// <summary>
+    /// スキンIDの設定
+    /// </summary>
+    /// <param name="_skinNum"></param>
+    public void SetSkinNum(int _skinNum) { skinNum = _skinNum; }
 
     public PlayerType GetPlayerType() => playerType;
 

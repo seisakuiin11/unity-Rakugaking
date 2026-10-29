@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 
 /// <summary>
@@ -12,7 +13,7 @@ public class CharacterCommon : MonoBehaviour
 
     CharacterController charaCon;
     Rigidbody2D rb;
-    [SerializeField] CapsuleCollider2D capsuleCol;
+    BoxCollider2D pCol;
     [SerializeField] GameObject shieldObject;
 
     private float moveSpeed;                     //速度
@@ -53,6 +54,7 @@ public class CharacterCommon : MonoBehaviour
         jumpForce = _charaData.jumpForce;
 
         colManager= _colManager;
+        pCol=GetComponent<BoxCollider2D>();
 
         currentShield = maxShield;
 
@@ -77,11 +79,11 @@ public class CharacterCommon : MonoBehaviour
     /// <param name="value"></param>
     public void FixedMoveAction(Vector2 value)
     {
+        //入力がデッドゾーン以下なら移動しない
+        if (DeadZoneCheck_X(value.x)) return;
 
         var v = rb.linearVelocity;
 
-        //入力がデッドゾーン以下なら移動しない
-        if (Mathf.Abs(value.x) <= sideMoveDeadZone) return;
 
 
         // 入力から方向を調べ、進行方向にする
@@ -106,7 +108,7 @@ public class CharacterCommon : MonoBehaviour
 
 
         //入力がデッドゾーン以下なら移動しない
-        if (Mathf.Abs(value.x) <= sideMoveDeadZone) return;
+        if (DeadZoneCheck_X(value.x)) return;
 
         v.x = value.x * moveSpeed * Time.deltaTime;
 
@@ -144,7 +146,7 @@ public class CharacterCommon : MonoBehaviour
     public bool FootingGroundCheck(out Collider2D col)
     {
 
-        CapsuleCollider2D pCol = GetComponent<CapsuleCollider2D>();
+        BoxCollider2D pCol = GetComponent<BoxCollider2D>();
 
 
         var pColHeightHalf = pCol.size.y / 2;
@@ -174,15 +176,15 @@ public class CharacterCommon : MonoBehaviour
     /// <param name="footingCol"></param>
     public void FootingGroundOff(Collider2D footingCol)
     {
-
-        CapsuleCollider2D pCol = GetComponent<CapsuleCollider2D>();
-
         StartCoroutine(FootingGroundOFF(pCol, footingCol));
     }
 
     private IEnumerator FootingGroundOFF(Collider2D iCol, Collider2D footingCol)
     {
+        //対象のコライダーを処理しないようにする（台から降りる）
         Physics2D.IgnoreCollision(iCol, footingCol, true);
+        
+        //0.5秒後元に戻す
         yield return new WaitForSeconds(0.5f);
         Physics2D.IgnoreCollision(iCol, footingCol, false);
     }
@@ -468,12 +470,8 @@ public class CharacterCommon : MonoBehaviour
     /// <returns></returns>
     public bool GroundCheck()
     {
-        CapsuleCollider2D pCol = GetComponent<CapsuleCollider2D>();
-        //var pColHeightHalf = transform.localScale.y/2;
-
-        //RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * (pColHeightHalf + 0.01f), Vector2.down, 0.1f);
-
-        var pColHeightHalf = pCol.size.y / 2;
+      
+        var pColHeightHalf = pCol.size.y*transform.localScale.y / 2;
 
         RaycastHit2D hit = Physics2D.Raycast(transform.position + Vector3.down * (pColHeightHalf + 0.01f), Vector2.down, 0.1f);
 
@@ -483,13 +481,46 @@ public class CharacterCommon : MonoBehaviour
         if (hit.collider == null) return false;
 
         if (hit.collider.tag == "Player") return false;
-        //Debug.Log(hit.collider, gameObject);
+       
 
         return true;
 
 
 
     }
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+
+        BoxCollider2D _pCol=GetComponent<BoxCollider2D>();
+       
+        var pColHeightHalf = _pCol.size.y * transform.localScale.y / 2;
+        Ray hit = new Ray(transform.position + Vector3.down * (pColHeightHalf + 0.01f), Vector2.down);
+
+        Gizmos.DrawRay(hit);
+
+
+    }
+
+
+    /// <summary>
+    /// 上昇中か取得
+    /// </summary>
+    /// <returns></returns>
+    public bool UpCheck()
+    {
+        return rb.linearVelocityY > 0;
+    }
+
+    /// <summary>
+    /// 左スティックのX軸入力がデッドゾーンの値か取得
+    /// </summary>
+    /// <returns></returns>
+    public bool DeadZoneCheck_X(float xValue)
+    {
+        return Mathf.Abs(xValue) <= sideMoveDeadZone;
+    }
+
     public int GetHP() => hp;
     /// <summary>
     /// 現在のシールド割合を取得する

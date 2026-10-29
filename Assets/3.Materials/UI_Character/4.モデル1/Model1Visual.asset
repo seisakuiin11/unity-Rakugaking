@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71bdeb7976612974db43dc47c392cdb9, type: 3}
+  m_Name: Model1Visual
+  m_EditorClassIdentifier: 
+  KeyVisual: {fileID: 6262219920445633432, guid: 41f07d2dd0d588c429713dc44ea0b20d, type: 3}
+  BustUp: {fileID: -2726393474819384080, guid: a426b3e94fe78314fbbdce620f43ce31, type: 3}
+  Icon: {fileID: 3166864093431878175, guid: e3bbfb91f3bcac440bcdd0036fd84fc7, type: 3}

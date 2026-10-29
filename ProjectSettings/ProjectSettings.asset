@@ -12,7 +12,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: "\u7AE5\u5FC3\u3092\u5FD8\u308C\u306A\u3044\u3089\u304F\u304C\u304D\u3093\u3050\u88FD\u4F5C\u59D4\u54E1\u4F1A"
   productName: RakugaKing
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -292,7 +292,14 @@ PlayerSettings:
   AndroidAppBundleSizeToValidate: 150
   AndroidReportGooglePlayAppDependencies: 1
   androidSymbolsSizeThreshold: 800
-  m_BuildTargetIcons: []
+  m_BuildTargetIcons:
+  - m_BuildTarget: 
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: c5817e53c07706f409d5bbac492bd46b, type: 3}
+      m_Width: 128
+      m_Height: 128
+      m_Kind: 0
   m_BuildTargetPlatformIcons:
   - m_BuildTarget: iPhone
     m_Icons:

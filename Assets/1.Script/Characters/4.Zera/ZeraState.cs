@@ -130,7 +130,7 @@ public class ZeraRightAttackState : AttackState
             behavior.SpikeStackUp();
 
             // スティック方向を向く (横)
-            charaCommon.DirectionChange(inputData.DIRECTION_VEC2.x);
+            if(!charaCommon.DeadZoneCheck_X(inputData.DIRECTION_VEC2.x))charaCommon.DirectionChange(inputData.DIRECTION_VEC2.x);
         }
         else
         {

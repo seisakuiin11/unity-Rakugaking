@@ -40,8 +40,9 @@ public class ResultDirector : MonoBehaviour
     {
         // 勝者のプレイヤー番号とキャラIDを取得
         ProjectManager.Instance.GetWinner(out var playerIndex, out var charaNum);
+        var skinNums = ProjectManager.Instance.GetSkinNums();
 
-        winnerImg.sprite = CharaDataManager.Instance.GetVisualData(charaNum).KeyVisual;
+        winnerImg.sprite = CharaDataManager.Instance.GetVisualData(charaNum, skinNums[playerIndex]).KeyVisual;
         playerAnim.SetInteger("Player", playerIndex);
 
         // キャラID取得

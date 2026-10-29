@@ -30,10 +30,12 @@ public class ProjectManager : MonoBehaviour
     bool LoopSceneFlagOld;
 
     [SerializeField] int[] charaIDs;            // 選択したキャラたちのIDが格納させる
+    [SerializeField] int[] skinNums;            // 各プレイヤーが選択したスキンID
     [SerializeField] PlayerType[] playerTypes;  // ○Pが人間かCPUか
     [SerializeField] int winnerIndex;           // 勝者
 
     [SerializeField] SoundManager soundManager;  // サウンド管理者
+    [SerializeField] CharaDataManager charaDataManager; // キャラデータ管理者
     [SerializeField] GameObject backImg;
 
     SceneLoder sceneLoder;      // シーン管理者
@@ -78,6 +80,9 @@ public class ProjectManager : MonoBehaviour
         // サウンド素材のロード
         await soundManager.Init(_scene);
 
+        // キャラデータのロード
+        await charaDataManager.Init();
+
         // シーンを呼び出す
         ChangeScene(_scene);
     }
@@ -104,9 +109,10 @@ public class ProjectManager : MonoBehaviour
     /// <summary>
     /// キャラID配列をProjectManagerに渡す
     /// </summary>
-    public void SetCharaIDs(int[] _charaIDs, PlayerType[] _playerTypes)
+    public void SetCharaIDs(int[] _charaIDs, int[] _skinNums, PlayerType[] _playerTypes)
     {
         charaIDs = _charaIDs.ToArray();
+        skinNums = _skinNums.ToArray();
         playerTypes = _playerTypes.ToArray();
     }
 
@@ -124,6 +130,17 @@ public class ProjectManager : MonoBehaviour
     /// キャラIDをProjectManagerから受け取る
     /// </summary>
     public int[] GetCharaIDs() { return charaIDs; }
+
+    /// <summary>
+    /// 各プレイヤーが選択したスキンIDを返す
+    /// </summary>
+    /// <returns></returns>
+    public int[] GetSkinNums() { return skinNums; }
+
+    /// <summary>
+    /// 操作プレイヤーのタイプ
+    /// </summary>
+    /// <returns></returns>
     public PlayerType[] GetPlayerTypes() { return playerTypes; }
 
     /// <summary>

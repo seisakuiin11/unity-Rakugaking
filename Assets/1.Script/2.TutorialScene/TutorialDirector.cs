@@ -2,10 +2,12 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class TutorialDirector : MonoBehaviour
 {
     const byte Player = 0, CPU = 1, MaxPlayer = 2;
+    const int UIWaitTime = 300;
 
     [SerializeField, Header("復活までの時間")] int waitReviveTime = 1000;
     [SerializeField, Header("復活時のポジション")] Vector3 revivePos;
@@ -16,11 +18,21 @@ public class TutorialDirector : MonoBehaviour
     [Header("チュートリアル情報")]
     [SerializeField] float waitStateTime;           // 各チュートリアルStateの最低継続時間
     [SerializeField] TextMeshProUGUI tutorialText;  // チュートリアルテキスト
+    [SerializeField] Image tutorialKeyIcon;         // チュートリアル キーボードアイコン
+    [SerializeField] Image tutorialBtnIcon;         // チュートリアル コントローラーアイコン
     [SerializeField] Animator tutorialTextAnim;     // チュートリアルテキスト アニメーション
-    [SerializeField,TextArea] string tutorialText_Move;      // チュートリアルテキスト 移動,ジャンプ
-    [SerializeField,TextArea] string tutorialText_Attack;    // チュートリアルテキスト 攻撃
+    [SerializeField,TextArea] string tutorialText_Move;       // チュートリアルテキスト 移動,ジャンプ
+    [SerializeField] Sprite tutorialKeyIcon_Move;
+    [SerializeField] Sprite tutorialBtnIcon_Move;
+    [SerializeField,TextArea] string tutorialText_Attack;     // チュートリアルテキスト 攻撃
+    [SerializeField] Sprite tutorialKeyIcon_Attack;
+    [SerializeField] Sprite tutorialBtnIcon_Attack;
     [SerializeField, TextArea] string tutorialText_Shield;    // チュートリアルテキスト ガード
+    [SerializeField] Sprite tutorialKeyIcon_Shield;
+    [SerializeField] Sprite tutorialBtnIcon_Shield;
     [SerializeField, TextArea] string tutorialText_Free;      // チュートリアルテキスト フリー
+    [SerializeField] Sprite tutorialKeyIcon_Free;
+    [SerializeField] Sprite tutorialBtnIcon_Free;
     [SerializeField] int attackClearCount = 5;      // 達成目標 ダメージを与えた回数
 
     [Space]
@@ -37,6 +49,7 @@ public class TutorialDirector : MonoBehaviour
     bool moveFlag;      // 移動したか
     bool jumpFlag;      // ジャンプしたか
     int attackFlag;     // 何回攻撃してダメージを与えたか
+    bool uiWaitFlag;    // UI操作を受け付けない
 
     GAMESTATE gameState;
     enum GAMESTATE : byte
@@ -60,6 +73,7 @@ public class TutorialDirector : MonoBehaviour
     const TUTORIALSTATE Tutorial_Attack = TUTORIALSTATE.MOVE | TUTORIALSTATE.ATTACK;
     const TUTORIALSTATE Tutorial_Shield = TUTORIALSTATE.MOVE | TUTORIALSTATE.ATTACK | TUTORIALSTATE.SHIELD;
     const TUTORIALSTATE Tutorial_Free = TUTORIALSTATE.MOVE | TUTORIALSTATE.ATTACK | TUTORIALSTATE.SHIELD | TUTORIALSTATE.FREE;
+
 
     void Start()
     {
@@ -114,8 +128,9 @@ public class TutorialDirector : MonoBehaviour
 
         // キャラクター生成
         int[] charaIDs = new int[MaxPlayer] { 0, -1 };
+        int[] skinNums = new int[MaxPlayer] { 0,  0 };
         PlayerType[] playerTypes = new PlayerType[MaxPlayer] { PlayerType.PLAYER, PlayerType.CPU };
-        ProjectManager.Instance.SetCharaIDs(charaIDs, playerTypes);
+        ProjectManager.Instance.SetCharaIDs(charaIDs, skinNums, playerTypes);
         characters = charCreater.CreateCharacters(playerTypes, charaIDs, MaxPlayer); // プレイヤーとCPU(的)
 
         //　各キャラクターの初期化処理
@@ -132,6 +147,8 @@ public class TutorialDirector : MonoBehaviour
         // UI管理者の初期化処理
         gameUIController.Init(characters, MaxPlayer);
         tutorialText.text = "";
+        tutorialKeyIcon.sprite = null;
+        tutorialBtnIcon.sprite = null;
 
         // トランジション
         hideTransition.SetTrigger("Hide");
@@ -168,6 +185,13 @@ public class TutorialDirector : MonoBehaviour
         ProjectManager.Instance.ChangeScene(SceneName.TitleScene);
     }
 
+    // ボタンを押した後、入力を数瞬無効にする
+    public void SetWaitFlag()
+    {
+        uiWaitFlag = true;
+        Task.Run(async () => { await Task.Delay(UIWaitTime); uiWaitFlag = false; });
+    }
+
     // ゲーム操作アップデート ===========================================
     void GamePlayUpdate()
     {
@@ -200,6 +224,8 @@ public class TutorialDirector : MonoBehaviour
         tutorialState = Tutorial_Move;
         stateTime = waitStateTime;
         tutorialText.text = tutorialText_Move;
+        tutorialKeyIcon.sprite = tutorialKeyIcon_Move;
+        tutorialBtnIcon.sprite = tutorialBtnIcon_Move;
         tutorialTextAnim.SetTrigger("Show");
     }
     void TutorialMove(InputCommandData data)
@@ -230,6 +256,8 @@ public class TutorialDirector : MonoBehaviour
         await Task.Delay(fadeTime);
 
         tutorialText.text = tutorialText_Attack;
+        tutorialKeyIcon.sprite = tutorialKeyIcon_Attack;
+        tutorialBtnIcon.sprite= tutorialBtnIcon_Attack;
         // 表示
         tutorialTextAnim.SetTrigger("Show");
     }
@@ -259,6 +287,8 @@ public class TutorialDirector : MonoBehaviour
         await Task.Delay(fadeTime);
 
         tutorialText.text = tutorialText_Shield;
+        tutorialKeyIcon.sprite= tutorialKeyIcon_Shield;
+        tutorialBtnIcon.sprite = tutorialBtnIcon_Shield;
         // 表示
         tutorialTextAnim.SetTrigger("Show");
     }
@@ -284,6 +314,8 @@ public class TutorialDirector : MonoBehaviour
         await Task.Delay(fadeTime);
 
         tutorialText.text = tutorialText_Free;
+        tutorialKeyIcon.sprite = tutorialKeyIcon_Free;
+        tutorialBtnIcon.sprite= tutorialBtnIcon_Free;
         // 表示
         tutorialTextAnim.SetTrigger("Show");
     }
@@ -306,6 +338,10 @@ public class TutorialDirector : MonoBehaviour
     /// </summary>
     public void Pause(bool flag)
     {
+        if (uiWaitFlag) return;
+
+        SetWaitFlag();
+
         if (flag)
         {
             gameState = GAMESTATE.PAUSE;
@@ -392,7 +428,7 @@ public class TutorialDirector : MonoBehaviour
             data.SHIELD = _data.SHIELD.now;
         }
         // ポーズ
-        pause = _data.PAUSE;
+        pause = _data.PAUSE.IsPressed;
 
         return data;
     }

@@ -5,70 +5,6 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-// カスタムエディター
-#if UNITY_EDITOR
-using UnityEditor;
-[CustomEditor(typeof(SoundManager))]
-public class SoundManagerEditor : Editor
-{
-    SerializedProperty bgmLoadFlag;
-    SerializedProperty seLoadFlag;
-    SerializedProperty charaseLoadFlag;
-    SerializedProperty narboLoadFlag;
-    SerializedProperty slasherLoadFlag;
-    SerializedProperty boyLoadFlag;
-    SerializedProperty zeraLoadFlag;
-
-    private void OnEnable()
-    {
-        // 紐づけ
-        bgmLoadFlag = serializedObject.FindProperty("bgmLoadFlag");
-        seLoadFlag = serializedObject.FindProperty("seLoadFlag");
-        charaseLoadFlag = serializedObject.FindProperty("charaseLoadFlag");
-        narboLoadFlag = serializedObject.FindProperty("narboLoadFlag");
-        slasherLoadFlag = serializedObject.FindProperty("slasherLoadFlag");
-        boyLoadFlag = serializedObject.FindProperty("boyLoadFlag");
-        zeraLoadFlag = serializedObject.FindProperty("zeraLoadFlag");
-    }
-
-    public override void OnInspectorGUI()
-    {
-        serializedObject.Update();
-
-        // 指定項目以外を表示
-        DrawPropertiesExcluding(serializedObject,
-            "bgmLoadFlag",
-            "seLoadFlag",
-            "charaseLoadFlag",
-            "narboLoadFlag",
-            "slasherLoadFlag",
-            "boyLoadFlag",
-            "zeraLoadFlag"
-        );
-
-        // 描画
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("ロードする音素材", EditorStyles.boldLabel);
-        bgmLoadFlag.boolValue = EditorGUILayout.ToggleLeft("BGM", bgmLoadFlag.boolValue);
-        seLoadFlag.boolValue = EditorGUILayout.ToggleLeft("SE", seLoadFlag.boolValue);
-        charaseLoadFlag.boolValue = EditorGUILayout.ToggleLeft("キャラSE", charaseLoadFlag.boolValue);
-
-        // falseなら編集不可
-        EditorGUI.BeginDisabledGroup(!charaseLoadFlag.boolValue);
-
-        // 対象となる変数 描画
-        narboLoadFlag.boolValue = EditorGUILayout.ToggleLeft("ナルボ", narboLoadFlag.boolValue);
-        slasherLoadFlag.boolValue = EditorGUILayout.ToggleLeft("スラッシャー", slasherLoadFlag.boolValue);
-        boyLoadFlag.boolValue = EditorGUILayout.ToggleLeft("ボーイ", boyLoadFlag.boolValue);
-        zeraLoadFlag.boolValue = EditorGUILayout.ToggleLeft("ゼーラ", zeraLoadFlag.boolValue);
-
-        EditorGUI.EndDisabledGroup();
-
-        serializedObject.ApplyModifiedProperties();
-    }
-}
-
-#endif
 
 /// <summary>
 /// BGM
@@ -110,9 +46,8 @@ public enum SE
 public enum CHARASE
 {   // 共通SE ---------------------------
     JUMP,
-    HIT_1, HIT_2, //HIT_3,
-    GUARD_1, /*GUARD_2,*/ GUARD_CRASH,
-    //PIYOPIYO,
+    HIT_1, HIT_2,
+    GUARD_1, GUARD_CRASH,
     NARBO_ZINARASI, // ナルボ -----------
     NARBO_STRIKE,
     NARBO_WASHOI,
@@ -135,6 +70,9 @@ public enum CHARASE
     MAX
 }
 
+/// <summary>
+/// BGM,SEを再生,管理するクラス
+/// </summary>
 public class SoundManager : MonoBehaviour
 {
     const string NARBO = "NARBO", SLASHER = "SLASHER", BOY = "BOY", ZERA = "ZERA";
@@ -328,6 +266,9 @@ public class SoundManager : MonoBehaviour
         foreach (var id in charaIDs)
         {
             if(id < 0) continue;
+
+            // オーバーした場合
+            if(id + (int)BGM.NARBO >= (int)BGM.MAX) { list.Add(BGM.NARBO); continue; }
 
             BGM charaBGM = BGM.NARBO + (byte)id;
             list.Add(charaBGM);

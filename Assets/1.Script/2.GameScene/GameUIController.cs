@@ -43,13 +43,14 @@ public class GameUIController : MonoBehaviour
         int count = 0;
         var harfWidth = (maxPlayer - 1) * charaUIDisSpace * 0.5f;
         var charaIDs = ProjectManager.Instance.GetCharaIDs();
+        var skinNums = ProjectManager.Instance.GetSkinNums();
         for(int i = 0; i < _characters.Length; i++)
         {
             if (_characters[i] == null) continue;
 
             charaUIs[i].gameObject.SetActive(true);
             charaUIs[i].transform.Translate(count * charaUIDisSpace - harfWidth, 0, 0);  // ポジション設定
-            charaUIs[i].Init(charaIDs[i], _characters[i].GetHP());
+            charaUIs[i].Init(charaIDs[i], skinNums[i], _characters[i].GetHP());
             _characters[i].OnDamage += ChangeHP;
             count++;
         }

@@ -123,8 +123,8 @@ GameObject:
   - component: {fileID: 9132147412365986167}
   - component: {fileID: 2921950389074967410}
   - component: {fileID: 4042453791925665867}
-  - component: {fileID: 769594930785852654}
   - component: {fileID: 1980599821468343354}
+  - component: {fileID: 7631915410410733615}
   m_Layer: 6
   m_Name: Slasher
   m_TagString: Player
@@ -181,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb38bfb367760a2479e5684912c99f25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  capsuleCol: {fileID: 769594930785852654}
+  capsuleCol: {fileID: 0}
   shieldObject: {fileID: 8322095347160979244}
   stanFrame: 120
   shieldBreakKnockBack: {x: 0, y: 30}
@@ -212,8 +212,20 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!70 &769594930785852654
-CapsuleCollider2D:
+--- !u!114 &1980599821468343354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3973439399624765838}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24adb71c847b64a4681215bac4bbfd6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!61 &7631915410410733615
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -247,20 +259,17 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 2, y: 4}
-  m_Direction: 0
---- !u!114 &1980599821468343354
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3973439399624765838}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24adb71c847b64a4681215bac4bbfd6a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.65, y: 4.2}
+  m_EdgeRadius: 0
 --- !u!1 &6791740610579806310
 GameObject:
   m_ObjectHideFlags: 0

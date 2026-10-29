@@ -45,7 +45,7 @@ public  struct InputGameData
     public ButtonState SHIELD;
     
     /// <summary> ポーズボタンの入力情報</summary>
-    public bool PAUSE;
+    public ButtonState PAUSE;
 
 }
 
